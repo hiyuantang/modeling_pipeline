@@ -17,6 +17,15 @@ cd path/to/src
 # Prerequisites
 Ensure you have the following prerequisites installed:
 - Python 3.11
+- matplotlib
+- numpy
+- scipy
+- scikit-learn
+- torch
+- torchvision
+- torchsummary
+- tqdm
+- pillow
 
 # Usage
 Run `main.py` using the following command:
