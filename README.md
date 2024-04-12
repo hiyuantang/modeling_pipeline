@@ -1,7 +1,7 @@
 # Modeling Pipeline
 
 ## Introduction
-Welcome to the Project Name, a comprehensive solution for training, testing, and visualizing machine learning models. The main script, `main.py`, streamlines the process of managing your machine learning experiments.
+Welcome to the `Modeling Pipeline`, a comprehensive solution for training, testing, and visualizing machine learning models. The main script, `main.py`, streamlines the process of managing your machine learning experiments.
 
 ## Features
 - **Automated Directory Management**: Automatically creates a `results` directory and a session directory with a unique random hash for each training session.
