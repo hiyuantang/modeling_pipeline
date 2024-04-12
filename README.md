@@ -29,7 +29,9 @@ Ensure you have the following prerequisites installed:
 
 # Usage
 Run `main.py` using the following command:
-`python3 main.py --model_name vgg16`
+```bash
+python3 main.py --model_name vgg16 --train_data_dir your_data_path --epochs 200 --batch_size 64 --device cuda 
+```
 
 # Customization
 `main.py` uses `argparse` for customization. The current version supports the following arguments:
