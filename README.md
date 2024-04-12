@@ -16,7 +16,7 @@ cd path/to/src
 
 # Prerequisites
 Ensure you have the following prerequisites installed:
-- Python 3.11
+- python 3.11
 - matplotlib
 - numpy
 - scipy
