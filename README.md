@@ -40,9 +40,6 @@ The `main.py` script is highly customizable through the use of command-line argu
 - **`--session_path`**: Specifies the path to the model that should be tested. This argument is required when `--test_only` is set to `True`, to indicate which trained model to use for testing.
 
 Remember to adjust these settings according to your project requirements and system configuration.
-
-
-Note: The default device is set to `'cuda'`. If you are using a Mac, replace `'cuda'` with `'mps'` to utilize Apple’s Metal Performance Shaders for GPU acceleration.
  
 # License
 This project is licensed under the MIT License - see the `LICENSE.md` file for details.
