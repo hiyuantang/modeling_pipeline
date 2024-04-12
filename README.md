@@ -51,6 +51,12 @@ The `main.py` script is highly customizable through the use of command-line argu
 - **`--session_path`**: Specifies the path to the model that should be tested. This argument is required when `--test_only` is set to `True`, to indicate which trained model to use for testing.
 
 Remember to adjust these settings according to your project requirements and system configuration.
- 
+
+# Visualization
+![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/1d37f106-ab0c-4ba9-9012-eb315e5e74f2)
+![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/d700bac9-059a-40ee-8b46-b82e0a35606c)
+![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/528ad12e-1dd4-4b29-b9a9-0e06e12e680b)
+![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/41f5ce07-f205-43a8-8e7b-7b2a1d4c8103)
+
 # License
 This project is licensed under the MIT License - see the `LICENSE.md` file for details.
