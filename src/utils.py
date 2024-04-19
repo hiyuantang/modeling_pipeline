@@ -2,11 +2,15 @@ import os
 import hashlib
 import time
 import json
+import pickle
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import models
 from torchvision.models import resnet, vgg
 from torchsummary import summary
+from torch.utils.data import DataLoader
+from pickle_dataset import PreprocessedDataset
 
 def transform_to_dict(transform):
     # Assuming each transform has a name attribute
@@ -98,3 +102,27 @@ def get_subdirpath_list(directory_path='results'):
         cur_path = os.path.join('results', subdir)
         result_path_list.append(cur_path)
     return result_path_list
+
+def preprocess_and_save_dataset(dataloader, save_path):
+    if os.path.exists(save_path):
+        print(f"Preprocessed data file '{save_path}' already exists. Continuing without reprocessing.")
+        return
+
+    preprocessed_data = []
+    for images, labels in tqdm(dataloader, desc='Progress'):
+        preprocessed_data.append((images, labels))
+
+    with open(save_path, 'wb') as f:
+        pickle.dump(preprocessed_data, f)
+        print(f"Preprocessed data saved to '{save_path}'.")
+
+def load_preprocessed_dataset(pkl_path):
+    with open(pkl_path, 'rb') as f:
+        preprocessed_data = pickle.load(f)
+    return preprocessed_data
+
+def create_dataloader_from_preprocessed(pkl_path, batch_size, shuffle=True):
+    preprocessed_data = load_preprocessed_dataset(pkl_path)
+    preprocessed_dataset = PreprocessedDataset(preprocessed_data)
+    preprocessed_dataloader = DataLoader(preprocessed_dataset, batch_size=batch_size, shuffle=shuffle)
+    return preprocessed_dataloader
