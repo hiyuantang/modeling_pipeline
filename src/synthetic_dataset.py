@@ -106,12 +106,15 @@ class SyntheticDataset(Dataset):
 
 def getitem_list_helper(list_, idx, expand, transform):
     path, _, label = list_[idx]
-    if expand == True:
-        image = Image.open(path).convert("RGB")
-    else:
-        image = Image.open(path)
+    image = Image.open(path)
+
+    if not expand:
+        # Convert the image to grayscale by averaging over RGB channels
+        image = image.convert("L")
+
     if transform:
         image = transform(image)
+    
     label = torch.tensor(label, dtype=torch.float32)
     return image, label
 

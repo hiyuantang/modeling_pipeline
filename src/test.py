@@ -1,8 +1,7 @@
 import torch
-import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from SyntheticDataset import SyntheticDataset
+from pickle_dataset import PreprocessedDataset
 from tqdm import tqdm
 import os
 import json
@@ -20,8 +19,8 @@ def test(session_dir, test_data_dir, batch_size, device):
     transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
     ])
 
-    # Load your dataset
-    test_dataset = SyntheticDataset(test_data_dir, transform=test_transform)
+    
+    test_dataset = create_dataset_from_preprocessed(test_data_dir, test_transform)
 
     # Create DataLoaders for each subset
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)

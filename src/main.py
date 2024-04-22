@@ -7,9 +7,10 @@ from test import test
 from utils import *
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model.')
+    parser = argparse.ArgumentParser(description='Modeling Pipeline.')
     parser.add_argument('--model_name', type=str, default='resnet34', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:\db_synthetic_1', help='Directory of the training data')
+    parser.add_argument('--test_data_dir', type=str, default='E:\db_synthetic_1', help='Directory of the training data')
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
@@ -32,6 +33,7 @@ def main():
             'id': session_results_dir, 
             'model_name': args.model_name,
             'train_data_dir': args.train_data_dir,
+            'test_data_dir': args.test_data_dir, 
             'epochs': args.epochs,
             'batch_size': args.batch_size,
             'learning_rate': args.learning_rate,
@@ -57,7 +59,7 @@ def main():
             batch_size=args.batch_size, device=args.device)
     
     else:
-        test(session_dir=args.session_path, test_data_dir=args.train_data_dir, 
+        test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
             batch_size=args.batch_size, device=args.device)
 
 if __name__ == "__main__":

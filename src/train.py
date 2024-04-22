@@ -2,19 +2,17 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from SyntheticDataset import SyntheticDataset
 from tqdm import tqdm
 import os
 import json
 import copy
 from torch.utils.data import random_split
-from utils import get_pretrained_model
+from utils import *
 
 def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device, 
           save_interval, patience, train_split, session_dir):
     # Load the dataset
     train_transform = transforms.Compose([
-    transforms.Resize((224, 224)),  
     transforms.RandomHorizontalFlip(),  
     transforms.RandomRotation(15), 
     # transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1), 
@@ -22,14 +20,18 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device,
     transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
     ])
 
-    val_transform = transforms.Compose([
-    transforms.Resize((224, 224)),  
+    val_transform = transforms.Compose([  
     transforms.ToTensor(), 
     transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
     ])
 
+    base_transform = transforms.Compose([
+    transforms.Resize((224, 224)),  
+    transforms.ToTensor()
+    ])
+
     # Load your dataset
-    dataset = SyntheticDataset(train_data_dir, transform=None)
+    dataset = create_dataset_from_preprocessed(train_data_dir, base_transform)
 
     # Split dataset into training and validation sets
     train_size = int(train_split * len(dataset))

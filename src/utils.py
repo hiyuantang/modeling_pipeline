@@ -121,8 +121,13 @@ def load_preprocessed_dataset(pkl_path):
         preprocessed_data = pickle.load(f)
     return preprocessed_data
 
-def create_dataloader_from_preprocessed(pkl_path, batch_size, shuffle=True):
+def create_dataset_from_preprocessed(pkl_path, transform):
     preprocessed_data = load_preprocessed_dataset(pkl_path)
-    preprocessed_dataset = PreprocessedDataset(preprocessed_data)
-    preprocessed_dataloader = DataLoader(preprocessed_dataset, batch_size=batch_size, shuffle=shuffle)
+    preprocessed_dataset = PreprocessedDataset(preprocessed_data, transform=transform)
+    return preprocessed_dataset
+
+def create_dataloader_from_preprocessed(pkl_path, batch_size, transform, shuffle=True):
+    preprocessed_data = load_preprocessed_dataset(pkl_path)
+    preprocessed_dataset = PreprocessedDataset(preprocessed_data, transform=transform)
+    preprocessed_dataloader = DataLoader(preprocessed_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=10)
     return preprocessed_dataloader
