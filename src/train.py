@@ -13,25 +13,23 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device,
           save_interval, patience, train_split, session_dir):
     # Load the dataset
     train_transform = transforms.Compose([
+    transforms.ToTensor(), 
+    transforms.Resize((224, 224)), 
     transforms.RandomHorizontalFlip(),  
     transforms.RandomRotation(15), 
-    # transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1), 
-    transforms.ToTensor(), 
-    transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
+    # transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),  
+    transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]) 
     ])
 
-    val_transform = transforms.Compose([  
+    val_transform = transforms.Compose([
     transforms.ToTensor(), 
-    transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
-    ])
-
-    base_transform = transforms.Compose([
-    transforms.Resize((224, 224)),  
-    transforms.ToTensor()
+    transforms.Resize((224, 224)),   
+    transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]) 
     ])
 
     # Load your dataset
-    dataset = create_dataset_from_preprocessed(train_data_dir, base_transform)
+    print('...training full dataset')
+    dataset = create_dataset_from_preprocessed(train_data_dir, None)
 
     # Split dataset into training and validation sets
     train_size = int(train_split * len(dataset))
@@ -45,6 +43,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device,
     # Create DataLoaders for each subset
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    print('...training dataset loading completed')
 
     # Early stopping initialization
     best_val_loss = float('inf')
