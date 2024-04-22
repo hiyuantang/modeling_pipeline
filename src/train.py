@@ -121,7 +121,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device,
         torch.save(best_model_state, best_model_save_path)
 
     # Save the loss_log dictionary as a JSON file
-    log_file_path = os.path.join(session_dir, 'loss_log.json')
+    log_file_path = os.path.join(session_dir, 'train_log.json')
     with open(log_file_path, 'w') as log_file:
         json.dump(loss_log, log_file)
 
