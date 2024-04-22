@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from pickle_dataset import PreprocessedDataset
 from tqdm import tqdm
 import os
 import json
@@ -14,16 +13,17 @@ def test(session_dir, test_data_dir, batch_size, device):
     model_info = json2dict(info_path)
     
     test_transform = transforms.Compose([
-    transforms.Resize((224, 224)),  
     transforms.ToTensor(), 
-    transforms.Normalize(mean=[0.5162, 0.5162, 0.5162], std=[0.2946, 0.2946, 0.2946]) 
+    transforms.Resize((224, 224)),  
+    transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]) 
     ])
 
-    
+    print('...loading testing dataset')
     test_dataset = create_dataset_from_preprocessed(test_data_dir, test_transform)
 
     # Create DataLoaders for each subset
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    print('...testing dataset loading completed')
 
     # Load the model
     model = get_pretrained_model(model_info['model_name'], num_classes=1, drop_rate=0.1, device=device, pretrained=False, print_summary=True)
