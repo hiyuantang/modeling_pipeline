@@ -9,7 +9,7 @@ import copy
 from torch.utils.data import random_split
 from utils import *
 
-def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device, 
+def train(model_name, train_data_dir, epochs, batch_size, learning_rate, pre_trained, device, 
           save_interval, patience, train_split, session_dir):
     # Load the dataset
     train_transform = transforms.Compose([
@@ -54,7 +54,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, device,
     loss_log = {'train_loss': [], 'val_loss': []}
 
     # Load the model
-    model = get_pretrained_model(model_name, num_classes=1, drop_rate=0.1, device=device, pretrained=True, print_summary=True)
+    model = get_pretrained_model(model_name, num_classes=1, drop_rate=0.1, device=device, pretrained=pre_trained, print_summary=True)
     device = torch.device(device)
     model = model.to(device)
 
