@@ -14,6 +14,7 @@ def main():
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('--pre_trained', type=bool, default=False, help='Pre-trained weights for the model')
     parser.add_argument('--device', type=str, default='cuda', help='Device to train on')
     parser.add_argument('--save_interval', type=int, default=-1, help='Interval to save the model')
     parser.add_argument('--patience', type=int, default=30, help='Patience for early stopping')
@@ -37,6 +38,7 @@ def main():
             'epochs': args.epochs,
             'batch_size': args.batch_size,
             'learning_rate': args.learning_rate,
+            'pre_trained': args.pre_trained,
             'device': args.device,
             'save_interval': args.save_interval,
             'patience': args.patience,
@@ -52,7 +54,7 @@ def main():
 
         # Call the train function
         train(args.model_name, args.train_data_dir, args.epochs, args.batch_size, 
-            args.learning_rate, args.device, args.save_interval, args.patience, 
+            args.learning_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
             args.train_split, session_results_dir)
 
         test(session_dir=session_results_dir, test_data_dir=args.train_data_dir, 
