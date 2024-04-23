@@ -16,7 +16,7 @@ def transform_to_dict(transform):
     # Assuming each transform has a name attribute
     return {t.__class__.__name__: t.__dict__ for t in transform.transforms}
 
-def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained=True, print_summary=False):
+def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained, print_summary=False):
     
     # Dictionary mapping model names to model functions and their respective weights
     model_dict = {
@@ -76,6 +76,9 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained=
             summary(model.to(torch.device(device)), input_size=input_size)
 
     return model
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters())
 
 def generate_unique_hash():
     # Loop until a unique hash is generated
