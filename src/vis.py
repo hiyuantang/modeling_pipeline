@@ -75,6 +75,59 @@ def pred_vis(session_path, save_dir):
     # Save the plot
     plt.savefig(os.path.join(save_dir, f'{model_name}_gt_pred_plot.png'))
 
+def metric_vis(result_path_list, metric):
+    pred_info_path_list = []
+    model_info_path_list = []
+    for session_path in result_path_list:
+        pred_info_path = os.path.join(session_path, 'pred.json')
+        model_info_path = os.path.join(session_path, 'info.json')
+        pred_info_path_list.append(pred_info_path)
+        model_info_path_list.append(model_info_path)
+    
+    model_name_list = []
+    metric_list = []
+    for i in model_info_path_list:
+        model_name_list.append(json2dict(i)['model_name'])
+    for i in pred_info_path_list:
+        pred_info = json2dict(i)
+        gt = np.array(pred_info['true_labels']).reshape(1, -1)
+        pred = np.array(pred_info['predictions']).reshape(1, -1)
+        if metric == 'r2':
+            r2 = r2_score(gt.reshape(-1, 1), pred.reshape(-1, 1))
+            metric_list.append(r2)
+        elif metric == 'acc':
+            accuracy = np.mean(np.abs(gt - pred) <= 1)
+            metric_list.append(accuracy)
+        else:
+            print('Metric not yet supported.')
+            return
+    
+    # Sort the metrics and model names based on the metric values
+    sorted_indices = np.argsort(metric_list)[::-1]
+    sorted_model_names = np.array(model_name_list)[sorted_indices]
+    sorted_metrics = np.array(metric_list)[sorted_indices]
+    
+    # Color settings
+    colors = ['crimson' if i == 0 else 'skyblue' for i in range(len(sorted_model_names))]
+    
+    # Create the bar plot
+    plt.figure(figsize=(5, 5))
+    bars = plt.bar(sorted_model_names, sorted_metrics, color=colors)
+    
+    # Highlight the best model
+    bars[0].set_label('Best Model')
+    plt.legend()
+    
+    plt.xlabel('Model Names')
+    plt.ylabel(metric.capitalize())
+    plt.title(f'Comparison of Models Based on {metric.upper()}')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+metric_vis(result_path_list, 'acc')
+metric_vis(result_path_list, 'r2')
+
 def main():
     parser = argparse.ArgumentParser(description='Result Visualization')
     parser.add_argument('--session_path', type=str, required=False, help='Path for a single session')
