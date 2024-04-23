@@ -14,6 +14,7 @@ def main():
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
+    parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
     parser.add_argument('--pre_trained', type=bool, default=False, help='Pre-trained weights for the model')
     parser.add_argument('--device', type=str, default='cuda', help='Device to train on')
     parser.add_argument('--save_interval', type=int, default=-1, help='Interval to save the model')
@@ -29,6 +30,11 @@ def main():
         session_results_dir = generate_unique_hash()
         os.makedirs(session_results_dir, exist_ok=True)
 
+        total_params = count_parameters(get_pretrained_model(args.model_name, num_classes=1, 
+                                                             drop_rate=args.drop_rate, device=args.device, 
+                                                             pretrained=args.pre_trained, 
+                                                             print_summary=False))
+
         # Create a dictionary with model information
         model_info = {
             'id': session_results_dir, 
@@ -38,11 +44,13 @@ def main():
             'epochs': args.epochs,
             'batch_size': args.batch_size,
             'learning_rate': args.learning_rate,
+            'drop_rate': args.drop_rate, 
             'pre_trained': args.pre_trained,
             'device': args.device,
             'save_interval': args.save_interval,
             'patience': args.patience,
-            'train_split': args.train_split
+            'train_split': args.train_split, 
+            'total_params': total_params
         }
 
         # Save the model information to info.json within the session directory
@@ -54,11 +62,11 @@ def main():
 
         # Call the train function
         train(args.model_name, args.train_data_dir, args.epochs, args.batch_size, 
-            args.learning_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
+            args.learning_rate, args.drop_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
             args.train_split, session_results_dir)
 
         test(session_dir=session_results_dir, test_data_dir=args.train_data_dir, 
-            batch_size=args.batch_size, device=args.device)
+            batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
     
     else:
         test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
