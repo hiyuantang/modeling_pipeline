@@ -1,4 +1,5 @@
 import os
+os.makedirs('./vis', exist_ok=True)
 import argparse
 from utils import *
 import matplotlib.pyplot as plt
