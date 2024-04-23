@@ -22,7 +22,7 @@ def test(session_dir, test_data_dir, batch_size, drop_rate, device):
     test_dataset = create_dataset_from_preprocessed(test_data_dir, test_transform)
 
     # Create DataLoaders for each subset
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     print('...testing dataset loading completed')
 
     # Load the model
