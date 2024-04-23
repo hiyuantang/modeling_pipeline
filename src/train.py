@@ -28,7 +28,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     ])
 
     # Load your dataset
-    print('...training full dataset')
+    print('...loading training dataset')
     dataset = create_dataset_from_preprocessed(train_data_dir, None)
 
     # Split dataset into training and validation sets
