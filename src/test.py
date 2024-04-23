@@ -6,7 +6,7 @@ import os
 import json
 from utils import *
 
-def test(session_dir, test_data_dir, batch_size, device):
+def test(session_dir, test_data_dir, batch_size, drop_rate, device):
 
     model_path = os.path.join(session_dir, 'best_model.pth')
     info_path = os.path.join(session_dir, 'info.json')
@@ -26,7 +26,7 @@ def test(session_dir, test_data_dir, batch_size, device):
     print('...testing dataset loading completed')
 
     # Load the model
-    model = get_pretrained_model(model_info['model_name'], num_classes=1, drop_rate=0.1, device=device, pretrained=False, print_summary=True)
+    model = get_pretrained_model(model_info['model_name'], num_classes=1, drop_rate=drop_rate, device=device, pretrained=False, print_summary=False)
     device = torch.device(device)
     model = model.to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
