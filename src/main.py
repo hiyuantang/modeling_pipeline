@@ -19,8 +19,8 @@ def main():
     parser.add_argument('--save_interval', type=int, default=-1, help='Interval to save the model')
     parser.add_argument('--patience', type=int, default=30, help='Patience for early stopping')
     parser.add_argument('--train_split', type=float, default=0.9, help='Train split ratio')
-    parser.add_argument('--test_only', type=bool, default=False, help='Make model inference')
-    parser.add_argument('--session_path', type=str, required=False, help='Tell which model to test')
+    parser.add_argument('--test_only', type=bool, default=False, help='Make model inference only without training')
+    parser.add_argument('--session_path', type=str, required=False, help='Path for the session for testing')
     args = parser.parse_args()
 
     if args.test_only==False:
