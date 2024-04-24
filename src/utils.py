@@ -7,7 +7,8 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import models
-from torchvision.models import resnet, vgg
+from torchvision.models import resnet, vgg, mobilenet
+from baseline_cnn import BaselineCNN
 from torchsummary import summary
 from torch.utils.data import DataLoader
 from pickle_dataset import PreprocessedDataset
@@ -20,6 +21,7 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
     
     # Dictionary mapping model names to model functions and their respective weights
     model_dict = {
+        # SOTA models
         'vgg16': (models.vgg16, vgg.VGG16_Weights.DEFAULT),
         'vgg19': (models.vgg19, vgg.VGG19_Weights.DEFAULT),
         'vgg16_bn': (models.vgg16_bn, vgg.VGG16_BN_Weights.DEFAULT),
@@ -28,7 +30,12 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         'resnet34': (models.resnet34, resnet.ResNet34_Weights.DEFAULT),
         'resnet50': (models.resnet50, resnet.ResNet50_Weights.DEFAULT),
         'resnet101': (models.resnet101, resnet.ResNet101_Weights.DEFAULT),
-        'resnet152': (models.resnet152, resnet.ResNet152_Weights.DEFAULT)
+        'resnet152': (models.resnet152, resnet.ResNet152_Weights.DEFAULT),
+        'mobilenet_v3_small': (models.mobilenet_v3_small, mobilenet.MobileNet_V3_Small_Weights.DEFAULT),
+        'mobilenet_v3_large': (models.mobilenet_v3_large, mobilenet.MobileNet_V3_Large_Weights.DEFAULT),
+
+        # Custom models
+        'baseline_cnn': (BaselineCNN, None) 
     }
 
     # Check if the model name is in the dictionary
@@ -45,8 +52,8 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         else:
             model = model_func(weights=None)
         
-        if model_name.startswith('vgg'):
-            # VGG models use 'classifier' attribute
+        if model_name.startswith('vgg') or model_name.startswith('mobilenet'):
+            # Models use 'classifier' attribute
             num_features = model.classifier[-1].in_features
             model.classifier[-1] = nn.Sequential(
                 nn.Linear(num_features, 512),
@@ -58,7 +65,7 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
                 nn.Linear(256, num_classes)
             )
         elif model_name.startswith('res'):
-            # ResNet models use 'fc' attribute
+            # Models use 'fc' attribute
             num_features = model.fc.in_features
             model.fc = nn.Sequential(
                 nn.Linear(num_features, 512),
@@ -69,6 +76,8 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
                 nn.Dropout(drop_rate),
                 nn.Linear(256, num_classes)
             )
+        elif model_name.startswith('baseline'):
+            pass
         else:
             raise ValueError("Model name must start with 'vgg' or 'res'.")
         
