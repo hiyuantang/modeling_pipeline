@@ -35,7 +35,7 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         'mobilenet_v3_large': (models.mobilenet_v3_large, mobilenet.MobileNet_V3_Large_Weights.DEFAULT),
 
         # Custom models
-        'baseline_cnn': (BaselineCNN, None) 
+        'baseline_cnn': (BaselineCNN(), None) 
     }
 
     # Check if the model name is in the dictionary
@@ -46,11 +46,9 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
     input_size = (3, 224, 224)  # Default input size for VGG and ResNet models
     
     if model_name in model_dict:
-        model_func, weights = model_dict[model_name]
+        model, weights = model_dict[model_name]
         if pretrained:
-            model = model_func(weights=weights)
-        else:
-            model = model_func(weights=None)
+            model = model(weights=weights)
         
         if model_name.startswith('vgg') or model_name.startswith('mobilenet'):
             # Models use 'classifier' attribute
