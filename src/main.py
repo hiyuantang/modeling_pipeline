@@ -8,7 +8,7 @@ from utils import *
 
 def main():
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
-    parser.add_argument('--model_name', type=str, default='mobilenet_v3_small', help='Name of the model')
+    parser.add_argument('--model_name', type=str, default='mobilenet_v3_large', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:/depth_None_True/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_dir', type=str, default='E:/depth_None_True/testset.pkl', help='Directory of the testing data')
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
@@ -23,6 +23,9 @@ def main():
     parser.add_argument('--test_only', type=bool, default=False, help='Make model inference only without training')
     parser.add_argument('--session_path', type=str, required=False, help='Path for the session for testing')
     args = parser.parse_args()
+
+    if args.model_name.startswith('baseline'):
+        args.pre_trained = False
 
     if args.test_only==False:
 
