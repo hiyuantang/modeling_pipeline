@@ -8,10 +8,10 @@ from utils import *
 
 def main():
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
-    parser.add_argument('--model_name', type=str, default='baseline_cnn', help='Name of the model')
+    parser.add_argument('--model_name', type=str, default='mobilenet_v3_large', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:/depth_None_True/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_dir', type=str, default='E:/depth_None_True/testset.pkl', help='Directory of the testing data')
-    parser.add_argument('--epochs', type=int, default=1, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
