@@ -8,7 +8,7 @@ from utils import *
 
 def main():
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
-    parser.add_argument('--model_name', type=str, default='baseline_cnn', help='Name of the model')
+    parser.add_argument('--model_name', type=str, default='mobilenet_v3_large', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:/depth_None_True/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_dir', type=str, default='E:/depth_None_True/testset.pkl', help='Directory of the testing data')
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
