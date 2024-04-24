@@ -35,7 +35,7 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         'mobilenet_v3_large': (models.mobilenet_v3_large, mobilenet.MobileNet_V3_Large_Weights.DEFAULT),
 
         # Custom models
-        'baseline_cnn': (BaselineCNN(), None) 
+        'baseline_cnn': (BaselineCNN, None) 
     }
 
     # Check if the model name is in the dictionary
@@ -47,37 +47,39 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
     
     if model_name in model_dict:
         model, weights = model_dict[model_name]
+        
         if pretrained:
             model = model(weights=weights)
+        else:
+            model = model()
         
-        if model_name.startswith('vgg') or model_name.startswith('mobilenet'):
-            # Models use 'classifier' attribute
-            num_features = model.classifier[-1].in_features
-            model.classifier[-1] = nn.Sequential(
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Dropout(drop_rate),
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Dropout(drop_rate),
-                nn.Linear(256, num_classes)
-            )
-        elif model_name.startswith('res'):
-            # Models use 'fc' attribute
-            num_features = model.fc.in_features
-            model.fc = nn.Sequential(
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Dropout(drop_rate),
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Dropout(drop_rate),
-                nn.Linear(256, num_classes)
-            )
-        elif model_name.startswith('baseline'):
+        if model_name.startswith('baseline'):
             pass
         else:
-            raise ValueError("Model name must start with 'vgg' or 'res'.")
+            if hasattr(model, 'classifier') and isinstance(model.classifier, nn.Module):
+                # Models use 'classifier' attribute
+                num_features = model.classifier[-1].in_features
+                model.classifier[-1] = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                )
+            elif hasattr(model, 'fc') and isinstance(model.fc, nn.Module):
+                # Models use 'fc' attribute for the fully connected layer
+                num_features = model.fc.in_features
+                model.fc = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                )
         
         if print_summary:
             summary(model.to(torch.device(device)), input_size=input_size)
