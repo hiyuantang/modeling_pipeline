@@ -107,22 +107,24 @@ def metric_vis(session_path_list, metric, save_dir, ylim=None):
         colors = ['crimson' if i == len(session_path_list)-1 else 'skyblue' for i in range(len(sorted_model_names))]
     
     # Create the bar plot
-    plt.figure(figsize=(5, 5))
-    bars = plt.bar(sorted_model_names, sorted_metrics, color=colors)
+    plt.figure(figsize=(15, 5))
+    bars = plt.bar(sorted_model_names, sorted_metrics, color=colors, width=0.7)
     
-    # Highlight the best model
-    if metric == 'r2' or metric == 'acc':
-        bars[0].set_label('Best Model')
-    elif metric == 'mse' or metric == 'mae':
-        bars[len(session_path_list)-1].set_label('Best Model')
-    plt.legend()
+    # Highlight the best model and show its score
+    best_model_index = 0 if metric in ['r2', 'acc'] else len(session_path_list) - 1
+    bars[best_model_index].set_label('Best Model')
+    plt.legend(fontsize=15)
+
+    # Annotate the best model's bar with its score
+    plt.text(best_model_index, sorted_metrics[best_model_index], f'{sorted_metrics[best_model_index]:.2f}', 
+            ha='center', va='bottom', fontsize=20)
     
-    plt.xlabel('Model Names')
-    plt.ylabel(metric.upper())
+    # plt.xlabel('Model Names')
+    plt.ylabel(metric.upper(), fontsize=15)
     if ylim != None:
         plt.ylim(ylim)
-    plt.title(f'Comparison of Models Based on {metric.upper()}')
-    plt.xticks(rotation=45)
+    plt.title(f'Comparison of Models Based on {metric.upper()}', fontsize=20)
+    plt.xticks(rotation=45, fontsize=20)
     plt.tight_layout()
 
     # Save the plot
