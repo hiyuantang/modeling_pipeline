@@ -46,22 +46,37 @@ python3 src/vis.py --all False --session_path <your_modeling_session_path>
 
 Please replace `<your_image_data_path>` and `<your_data_path>` with the actual paths to your data, and `<your_modeling_session_path>` with the path to your specific modeling session.
 
-# Customization
-`main.py` uses `argparse` for customization. The current version supports the following arguments:
-
 ## Configuration Arguments
-The `main.py` script is highly customizable through the use of command-line arguments. Below is a list of available arguments along with their descriptions and default values:
-- **`--model_name`**: Specifies the name of the model to be used. Default is `resnet34`.
-- **`--train_data_dir`**: Sets the directory where the training data is located. Default is `E:\\db_synthetic_1`.
-- **`--epochs`**: Determines the number of epochs for training the model. Default is `100`.
-- **`--batch_size`**: Defines the size of each batch of data to be processed. Default is `128`.
-- **`--learning_rate`**: Sets the learning rate for the training process. Default is `0.0001`.
-- **`--device`**: Chooses the device for training the model. Default is `cuda`. Mac users should replace this with `mps` to utilize Metal Performance Shaders.
-- **`--save_interval`**: The interval at which the model is saved during training. Default is `-1`, which means the model is not saved periodically.
-- **`--patience`**: The number of epochs to wait for improvement before early stopping. Default is `30`.
-- **`--train_split`**: The ratio of the dataset to be used for training. Default is `0.8`, meaning 80% for training and 20% for validation.
-- **`--test_only`**: When set to `True`, the script will only perform model inference without training. Default is `False`.
-- **`--session_path`**: Specifies the path to the model that should be tested. This argument is required when `--test_only` is set to `True`, to indicate which trained model to use for testing.
+
+### For `to_pickle.py`
+Customize the data processing with these arguments:
+
+- **`--data_dir`**: Path to the dataset directory. Default: `E:\\synthetic_kids`.
+- **`--image_type`**: Type of image (e.g., `depth`, `color`). Default: `depth`.
+- **`--mode`**: Dataset mode. Default: `None`.
+- **`--expand`**: Maintain 3 channels or average to 1 channel. Default: `True`.
+- **`--train_size`**: Proportion of the dataset for training. Default: `0.9`.
+
+### For `main.py`
+The `main.py` script offers a variety of command-line arguments for customization:
+
+- **`--model_name`**: The model to use. Default: `resnet34`.
+- **`--train_data_dir`**: The training data directory. Default: `E:\\db_synthetic_1`.
+- **`--epochs`**: Number of training epochs. Default: `100`.
+- **`--batch_size`**: Batch size for data processing. Default: `128`.
+- **`--learning_rate`**: Learning rate for training. Default: `0.0001`.
+- **`--device`**: Device for training (use `mps` for Mac). Default: `cuda`.
+- **`--save_interval`**: Model save interval during training (set `-1` for no periodic save). Default: `-1`.
+- **`--patience`**: Epochs to wait before early stopping. Default: `30`.
+- **`--train_split`**: Dataset ratio for training. Default: `0.8`.
+- **`--test_only`**: Perform only inference if `True`. Default: `False`.
+- **`--session_path`**: Path to the trained model for testing (required if `--test_only` is `True`).
+
+### For `vis.py`
+Configure the visualization of results with these command-line arguments:
+
+- **`--all`**: If set to `True`, visualizes all sessions in the results directory. Default: `True`.
+- **`--session_path`**: Specifies the path for visualizing a single session. This argument is not required if `--all` is set to `True`.
 
 Remember to adjust these settings according to your project requirements and system configuration.
 
