@@ -1,37 +1,54 @@
-# Modeling Pipeline
+# Synthetic Kids' Data Modeling Pipeline for Height Prediction
 
 ## Introduction
-Welcome to the `Modeling Pipeline`, a comprehensive solution for training, testing, and visualizing machine learning models. The main script, `main.py`, streamlines the process of managing your machine learning experiments.
+Welcome to the **Synthetic Kids' Data Modeling Pipeline for Height Prediction**, a streamlined solution for training, testing, and visualizing deep learning models using synthetic children's data. For more details, visit the project repository here.
 
 ## Features
-- **Automated Directory Management**: Automatically creates a `results` directory and a session directory with a unique random hash for each training session.
-- **Versatile Script**: Capable of performing training, testing, and visualization in a single run or individually as needed.
+- **Data Pickle File Transformation**: Turn image data into pickle files for training, testing, and visualization purposes.
+- **Automated Directory Management**: Automatically creates `results` and `vis` directories to store metadata, training logs, testing logs, model weights, and visualization diagrams, etc. Under the `results` directory, the script creates a session directory with a unique random hash for each training session.
+- **Versatile Script**: Capable of performing training, testing, and visualization in a few lines of bash command.
 
 ## Getting Started
-To get started with `main.py`, navigate to the `src` directory of the project:
+To get started with the pipeline, create a conda environment using the provided `environment.yml` file with the following command:
 
 ```bash
-cd path/to/src
+conda env create -f environment.yml
 ```
-
-# Prerequisites
-Ensure you have the following prerequisites installed:
-- python 3.11
-- matplotlib
-- numpy
-- scipy
-- scikit-learn
-- torch
-- torchvision
-- torchsummary
-- tqdm
-- pillow
 
 # Usage
-Run `main.py` using the following command:
+
+## Step 1: Prepare the Data
+To download the image data, visit the project repository.
+
+**Transform the image dataset into a pickle file for faster data loading:**
+Run `to_pickle.py` with the following command:
 ```bash
-python3 main.py --model_name vgg16 --train_data_dir your_data_path --epochs 200 --batch_size 64 --device cuda 
+python3 src/to_pickle.py --data_dir <your_image_data_path> --train_size 0.9
 ```
+
+## Step 2: Train the Model
+
+**Train the model, save the best model according to the validation set, and make inferences on test data:**
+Run main.py with the following command:
+```bash
+python3 src/main.py --model_name vgg16 --train_data_dir <your_data_path> --epochs 200 --batch_size 64 --device cuda
+```
+
+## Step 3: Visualize the Results
+
+**Visualize all modeling sessions at once:**
+Run vis.py with the following command:
+```bash
+python3 src/vis.py --all True
+```
+
+**Visualize a single modeling session:**
+Run vis.py with the following command:
+```bash
+python3 src/vis.py --all False --session_path <your_modeling_session_path>
+```
+
+Please replace `<your_image_data_path>` and `<your_data_path>` with the actual paths to your data, and `<your_modeling_session_path>` with the path to your specific modeling session.
 
 # Customization
 `main.py` uses `argparse` for customization. The current version supports the following arguments:
