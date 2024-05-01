@@ -21,7 +21,6 @@ conda env create -f environment.yml
 To download the image data, visit the project repository.
 
 **Transform the image dataset into a pickle file for faster data loading:**
-Run `to_pickle.py` with the following command:
 ```bash
 python3 src/to_pickle.py --data_dir <your_image_data_path> --train_size 0.9
 ```
@@ -29,7 +28,6 @@ python3 src/to_pickle.py --data_dir <your_image_data_path> --train_size 0.9
 ## Step 2: Train the Model
 
 **Train the model, save the best model according to the validation set, and make inferences on test data:**
-Run main.py with the following command:
 ```bash
 python3 src/main.py --model_name vgg16 --train_data_dir <your_data_path> --epochs 200 --batch_size 64 --device cuda
 ```
@@ -37,13 +35,11 @@ python3 src/main.py --model_name vgg16 --train_data_dir <your_data_path> --epoch
 ## Step 3: Visualize the Results
 
 **Visualize all modeling sessions at once:**
-Run vis.py with the following command:
 ```bash
 python3 src/vis.py --all True
 ```
 
 **Visualize a single modeling session:**
-Run vis.py with the following command:
 ```bash
 python3 src/vis.py --all False --session_path <your_modeling_session_path>
 ```
