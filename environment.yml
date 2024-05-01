@@ -1,0 +1,14 @@
+name: syn_model
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - matplotlib
+  - numpy
+  - scipy
+  - scikit-learn
+  - torch
+  - torchvision
+  - torchsummary
+  - tqdm
+  - pillow
