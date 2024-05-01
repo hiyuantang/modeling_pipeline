@@ -48,7 +48,7 @@ Please replace `<your_image_data_path>` and `<your_data_path>` with the actual p
 
 ## Configuration Arguments
 
-### For `to_pickle.py`
+### For [`to_pickle.py`](src/to_pickle.py)
 Customize the data processing with these arguments:
 
 - **`--data_dir`**: Path to the dataset directory. Default: `E:\\synthetic_kids`.
@@ -57,7 +57,7 @@ Customize the data processing with these arguments:
 - **`--expand`**: Maintain 3 channels or average to 1 channel. Default: `True`.
 - **`--train_size`**: Proportion of the dataset for training. Default: `0.9`.
 
-### For `main.py`
+### For [`main.py`](src/main.py)
 The `main.py` script offers a variety of command-line arguments for customization:
 
 - **`--model_name`**: The model to use. Default: `resnet34`.
@@ -72,7 +72,7 @@ The `main.py` script offers a variety of command-line arguments for customizatio
 - **`--test_only`**: Perform only inference if `True`. Default: `False`.
 - **`--session_path`**: Path to the trained model for testing (required if `--test_only` is `True`).
 
-### For `vis.py`
+### For [`vis.py`](src/vis.py)
 Configure the visualization of results with these command-line arguments:
 
 - **`--all`**: If set to `True`, visualizes all sessions in the results directory. Default: `True`.
