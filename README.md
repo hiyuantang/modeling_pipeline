@@ -81,9 +81,12 @@ Configure the visualization of results with these command-line arguments:
 Remember to adjust these settings according to your project requirements and system configuration.
 
 # Visualization Snapshot
-![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/1d37f106-ab0c-4ba9-9012-eb315e5e74f2)
-![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/d700bac9-059a-40ee-8b46-b82e0a35606c)
-![output](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/528ad12e-1dd4-4b29-b9a9-0e06e12e680b)
+![acc_plot](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/386142b2-9bd3-4f99-9317-a9cd3f6564e0)
+![mae_plot](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/7e16b064-881b-4bcd-ab44-cae6f0844846)
+![r2_plot](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/9ba7a287-467d-490e-8fd3-6371ac29f1ab)
+![train_loss_plot](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/818ba8e7-7328-4866-9925-a7a0cdc07bc7)
+![resnet50_gt_pred_plot](https://github.com/hiyuantang/modeling_pipeline/assets/24949723/48c580db-1665-41b6-8be2-dd0c3fcbe330)
+
 
 # License
 This project is licensed under the MIT License - see the `LICENSE.md` file for details.
