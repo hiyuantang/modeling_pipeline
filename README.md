@@ -1,7 +1,7 @@
 # Synthetic Kids' Data Modeling Pipeline for Height Prediction
 
 ## Introduction
-Welcome to the **Synthetic Kids' Data Modeling Pipeline for Height Prediction**, a streamlined solution for training, testing, and visualizing deep learning models using synthetic children's data. For more details, visit the project repository here.
+Welcome to the **Synthetic Kids' Data Modeling Pipeline for Height Prediction**, a streamlined solution for training, testing, and visualizing deep learning models using synthetic children's data. For accessing the synthetic kids' image dataset, visit the [repository](https://github.com/davidberth/ac297r_project6).
 
 ## Features
 - **Data Pickle File Transformation**: Turn image data into pickle files for training, testing, and visualization purposes.
@@ -18,7 +18,7 @@ conda env create -f environment.yml
 # Usage
 
 ## Step 1: Prepare the Data
-To download the image data, visit the project repository.
+To download the image data, visit the [repository](https://github.com/davidberth/ac297r_project6).
 
 **Transform the image dataset into a pickle file for faster data loading:**
 ```bash
