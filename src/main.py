@@ -34,7 +34,7 @@ def main():
         os.makedirs(session_results_dir, exist_ok=True)
 
         total_params = count_parameters(get_pretrained_model(args.model_name, num_classes=1, 
-                                                             drop_rate=args.drop_rate, device=args.device, 
+                                                             drop_rate=args.drop_rate, batch_size=args.batch_size, 
                                                              pretrained=args.pre_trained, 
                                                              print_summary=False))
 
