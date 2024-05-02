@@ -7,9 +7,9 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torchvision import models
-from torchvision.models import resnet, vgg, mobilenet
+from torchvision.models import resnet, vgg, mobilenet, vision_transformer
 from baseline_cnn import BaselineCNN
-from torchsummary import summary
+from torchinfo import summary
 from torch.utils.data import DataLoader
 from pickle_dataset import PreprocessedDataset
 
@@ -17,7 +17,7 @@ def transform_to_dict(transform):
     # Assuming each transform has a name attribute
     return {t.__class__.__name__: t.__dict__ for t in transform.transforms}
 
-def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained, print_summary=False):
+def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrained, print_summary=False):
     
     # Dictionary mapping model names to model functions and their respective weights
     model_dict = {
@@ -33,6 +33,11 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         'resnet152': (models.resnet152, resnet.ResNet152_Weights.DEFAULT),
         'mobilenet_v3_small': (models.mobilenet_v3_small, mobilenet.MobileNet_V3_Small_Weights.DEFAULT),
         'mobilenet_v3_large': (models.mobilenet_v3_large, mobilenet.MobileNet_V3_Large_Weights.DEFAULT),
+        'vit_b_16': (models.vit_b_16, vision_transformer.ViT_B_16_Weights.DEFAULT),
+        'vit_b_32': (models.vit_b_32, vision_transformer.ViT_B_32_Weights.DEFAULT),
+        'vit_l_16': (models.vit_l_16, vision_transformer.ViT_L_16_Weights.DEFAULT),
+        'vit_l_32': (models.vit_l_32, vision_transformer.ViT_L_32_Weights.DEFAULT),
+        'vit_h_14': (models.vit_h_14, vision_transformer.ViT_H_14_Weights.DEFAULT),
 
         # Custom models
         'baseline_cnn': (BaselineCNN, None) 
@@ -43,7 +48,6 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         raise ValueError(f"Model name '{model_name}' is not supported. Please choose from {list(model_dict.keys())}.")
 
     model = None
-    input_size = (3, 224, 224)  # Default input size for VGG and ResNet models
     
     if model_name in model_dict:
         model, weights = model_dict[model_name]
@@ -55,6 +59,17 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
         
         if model_name.startswith('baseline'):
             pass
+        elif model_name.startswith('vit_'):
+            num_features = model.heads.head.in_features
+            model.heads.head = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                    )
         else:
             if hasattr(model, 'classifier') and isinstance(model.classifier, nn.Module):
                 # Models use 'classifier' attribute
@@ -67,7 +82,7 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
                     nn.ReLU(),
                     nn.Dropout(drop_rate),
                     nn.Linear(256, num_classes)
-                )
+                    )
             elif hasattr(model, 'fc') and isinstance(model.fc, nn.Module):
                 # Models use 'fc' attribute for the fully connected layer
                 num_features = model.fc.in_features
@@ -79,10 +94,11 @@ def get_pretrained_model(model_name, num_classes, drop_rate, device, pretrained,
                     nn.ReLU(),
                     nn.Dropout(drop_rate),
                     nn.Linear(256, num_classes)
-                )
+                    )
         
         if print_summary:
-            summary(model.to(torch.device(device)), input_size=input_size)
+            input_size = (batch_size, 3, 224, 224)  # Default input size for pre-trained models
+            summary(model, input_size=input_size)
 
     return model
 
