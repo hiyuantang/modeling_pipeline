@@ -49,15 +49,6 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
         raise ValueError(f"Model name '{model_name}' is not supported. Please choose from {list(model_dict.keys())}.")
 
     model = None
-    sq = nn.Sequential(
-                    nn.Linear(num_features, 512),
-                    nn.ReLU(),
-                    nn.Dropout(drop_rate),
-                    nn.Linear(512, 256),
-                    nn.ReLU(),
-                    nn.Dropout(drop_rate),
-                    nn.Linear(256, num_classes)
-                    )
     
     if model_name in model_dict:
         model, weights = model_dict[model_name]
@@ -71,16 +62,40 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
             pass
         elif model_name.startswith('vit_'):
             num_features = model.heads.head.in_features
-            model.heads.head = sq
+            model.heads.head = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                    )
         else:
             if hasattr(model, 'classifier') and isinstance(model.classifier, nn.Module):
                 # Models use 'classifier' attribute
                 num_features = model.classifier[-1].in_features
-                model.classifier[-1] = sq
+                model.classifier[-1] = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                    )
             elif hasattr(model, 'fc') and isinstance(model.fc, nn.Module):
                 # Models use 'fc' attribute for the fully connected layer
                 num_features = model.fc.in_features
-                model.fc = sq
+                model.fc = nn.Sequential(
+                    nn.Linear(num_features, 512),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(512, 256),
+                    nn.ReLU(),
+                    nn.Dropout(drop_rate),
+                    nn.Linear(256, num_classes)
+                    )
     
     # Create a StringIO stream to capture the output
     f = io.StringIO()
