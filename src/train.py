@@ -54,7 +54,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     loss_log = {'train_loss': [], 'val_loss': []}
 
     # Load the model
-    model = get_pretrained_model(model_name, num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=pre_trained, print_summary=True)
+    model, _ = get_pretrained_model(model_name, num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=pre_trained)
     device = torch.device(device)
     model = model.to(device)
 
