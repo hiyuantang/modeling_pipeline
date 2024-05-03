@@ -8,7 +8,17 @@ from test import test
 from utils import *
 
 def main():
+    """
+    Main function to handle the training and testing pipeline of a machine learning model.
+
+    This script sets up the configuration for training and testing a model based on the provided
+    command line arguments. It supports running the model on different devices, using pre-trained
+    weights, and saving the model at specified intervals. The script can also perform testing only,
+    without training, if specified.
+    """
+    # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
+    # Add arguments for model configuration
     parser.add_argument('--model_name', type=str, default='baseline_cnn', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:/depth_None_True/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_dir', type=str, default='E:/depth_None_True/testset.pkl', help='Directory of the testing data')
@@ -25,18 +35,16 @@ def main():
     parser.add_argument('--session_path', type=str, required=False, help='Path for the session for testing')
     args = parser.parse_args()
 
+    # Ensure baseline models are not using pre-trained weights
     if args.model_name.startswith('baseline'):
         args.pre_trained = False
     
-    # Define training and testing device automatically (Removed TPU support)
+    # Automatically define the device for training and testing
     if args.device == 'auto': 
         if torch.cuda.is_available():
             args.device = torch.device('cuda')
         elif torch.backends.mps.is_available():
             args.device = torch.device('mps')
-        # elif "TPU_ACCELERATOR_TYPE" in os.environ:
-        #     import torch_xla.core.xla_model as xm
-        #     args.device = xm.xla_device()
         else:
             args.device = torch.device('cpu')
     else:
@@ -44,10 +52,9 @@ def main():
     
     print(f"Using device: {args.device}")
 
-    # Do both training and testing
-    if args.test_only==False:
-
-        # Generate a unique hash for the current training session
+    # If not in test-only mode, perform training and testing
+    if not args.test_only:
+         # Prepare for a new training session
         session_results_dir = generate_unique_hash()
         os.makedirs(session_results_dir, exist_ok=True)
 
@@ -90,7 +97,7 @@ def main():
 
         print(f'Session information saved to {info_file_path}')
 
-        # Call the train function
+        # Train the model
         train(args.model_name, args.train_data_dir, args.epochs, args.batch_size, 
             args.learning_rate, args.drop_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
             args.train_split, session_results_dir)
@@ -98,10 +105,11 @@ def main():
         test(session_dir=session_results_dir, test_data_dir=args.train_data_dir, 
             batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
     
-    # Do only testing without training
+    # If in test-only mode, perform testing only
     else:
         test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
             batch_size=args.batch_size, device=args.device)
 
+# Entry point of the script
 if __name__ == "__main__":
     main()
