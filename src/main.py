@@ -67,7 +67,7 @@ def main():
         del model_temp
 
         model_summary_file_path = os.path.join(session_results_dir, 'model_summary.txt')
-        with open(model_summary_file_path, 'w') as summary_file:
+        with open(model_summary_file_path, 'w', encoding='utf-8') as summary_file:
             summary_file.write(model_summary)
         
         print(f'Model information saved to {model_summary_file_path}')
