@@ -83,9 +83,8 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
                     model_save_path = os.path.join(session_dir, f'{model_name}_step_{i+1}.pth')
                     torch.save(model.state_dict(), model_save_path)
 
-        # Print statistics
+        # Compute average training loss
         epoch_loss = running_loss / len(train_loader)
-        print(f'Epoch {epoch+1}/{epochs} - Training Loss: {epoch_loss:.4f}')
 
         # Validation loop
         val_loss = 0.0
@@ -97,9 +96,11 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
                 loss = criterion(outputs, labels)
                 val_loss += loss.item()
 
-        # Calculate average validation loss
+        # Compute average validation loss
         val_loss /= len(val_loader)
-        print(f'Validation Loss: {val_loss:.4f}')
+
+        # Print Both losses
+        print(f'Epoch {epoch+1}/{epochs} - Training Loss: {epoch_loss:.4f} | Validation Loss: {val_loss:.4f}')
 
         # Append the loss values for the current epoch to the loss_log dictionary
         loss_log['train_loss'].append(epoch_loss)
