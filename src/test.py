@@ -26,7 +26,7 @@ def test(session_dir, test_data_dir, batch_size, drop_rate, device):
     print('...testing dataset loading completed')
 
     # Load the model
-    model = get_pretrained_model(model_info['model_name'], num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=False, print_summary=False)
+    model, _ = get_pretrained_model(model_info['model_name'], num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=False)
     device = torch.device(device)
     model = model.to(device)
     model.load_state_dict(torch.load(model_path, map_location=device))
