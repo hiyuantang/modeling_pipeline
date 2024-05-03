@@ -13,7 +13,7 @@ To get started with the pipeline, create a conda environment using the provided 
 
 ```bash
 conda env create -f environment.yml
-conda activate syn_model
+conda activate pytorch
 ```
 
 # Usage
