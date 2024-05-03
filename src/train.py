@@ -127,8 +127,3 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         json.dump(loss_log, log_file)
 
     print('Training completed and logs saved')
-
-if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
-    print(f"Using device: {device}")
-    train('vgg16', 'E:\db_synthetic_1', epochs=10, batch_size=32, learning_rate=0.001, device=device, save_interval=-1, patience=15, train_split=0.8)
