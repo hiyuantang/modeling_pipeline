@@ -56,7 +56,10 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
         if pretrained:
             model = model(weights=weights)
         else:
-            model = model()
+            try:
+                model = model()
+            except:
+                model = model(drop_rate, num_classes)
         
         if model_name.startswith('baseline'):
             pass
