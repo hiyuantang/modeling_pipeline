@@ -1,6 +1,7 @@
 import os
 os.makedirs('./results', exist_ok=True)
 import argparse
+import torch
 import json
 from train import train
 from test import test
@@ -16,7 +17,7 @@ def main():
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
     parser.add_argument('--pre_trained', type=bool, default=True, help='Pre-trained weights for the model')
-    parser.add_argument('--device', type=str, default='cuda', help='Device to train on')
+    parser.add_argument('--device', type=str, default='auto', choices=['auto', 'cuda', 'mps', 'cpu'], help='Device to train and test on')
     parser.add_argument('--save_interval', type=int, default=-1, help='Interval to save the model')
     parser.add_argument('--patience', type=int, default=30, help='Patience for early stopping')
     parser.add_argument('--train_split', type=float, default=0.9, help='Train split ratio')
@@ -26,7 +27,24 @@ def main():
 
     if args.model_name.startswith('baseline'):
         args.pre_trained = False
+    
+    # Define training and testing device automatically (Removed TPU support)
+    if args.device == 'auto': 
+        if torch.cuda.is_available():
+            args.device = torch.device('cuda')
+        elif torch.backends.mps.is_available():
+            args.device = torch.device('mps')
+        # elif "TPU_ACCELERATOR_TYPE" in os.environ:
+        #     import torch_xla.core.xla_model as xm
+        #     args.device = xm.xla_device()
+        else:
+            args.device = torch.device('cpu')
+    else:
+        pass
+    
+    print(f"Using device: {args.device}")
 
+    # Do both training and testing
     if args.test_only==False:
 
         # Generate a unique hash for the current training session
@@ -49,7 +67,7 @@ def main():
             'learning_rate': args.learning_rate,
             'drop_rate': args.drop_rate, 
             'pre_trained': args.pre_trained,
-            'device': args.device,
+            'device': str(args.device),
             'save_interval': args.save_interval,
             'patience': args.patience,
             'train_split': args.train_split, 
@@ -71,6 +89,7 @@ def main():
         test(session_dir=session_results_dir, test_data_dir=args.train_data_dir, 
             batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
     
+    # Do only testing without training
     else:
         test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
             batch_size=args.batch_size, device=args.device)
