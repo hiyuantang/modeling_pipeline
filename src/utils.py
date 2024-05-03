@@ -1,4 +1,6 @@
 import os
+import io
+from contextlib import redirect_stdout
 import hashlib
 import time
 import json
@@ -16,7 +18,7 @@ def transform_to_dict(transform):
     # Assuming each transform has a name attribute
     return {t.__class__.__name__: t.__dict__ for t in transform.transforms}
 
-def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrained, print_summary=False):
+def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrained):
     
     # Dictionary mapping model names to model functions and their respective weights
     model_dict = {
@@ -79,12 +81,16 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
                 # Models use 'fc' attribute for the fully connected layer
                 num_features = model.fc.in_features
                 model.fc = sq
-        
-        if print_summary:
-            input_size = (batch_size, 3, 224, 224)  # Default input size for pre-trained models
-            summary(model, input_size=input_size)
+    
+    # Create a StringIO stream to capture the output
+    f = io.StringIO()
+    with redirect_stdout(f):
+        summary(model, input_size=(batch_size, 3, 224, 224))
+    
+    # Get the summary from the StringIO stream
+    model_summary = f.getvalue()
 
-    return model
+    return model, model_summary
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters())
