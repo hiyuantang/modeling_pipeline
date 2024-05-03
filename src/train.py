@@ -100,7 +100,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         val_loss /= len(val_loader)
 
         # Print Both losses
-        print(f'Epoch {epoch+1}/{epochs} - Training Loss: {epoch_loss:.4f} | Validation Loss: {val_loss:.4f}')
+        print(f'Epoch {epoch+1}/{epochs} - Training MSELoss: {epoch_loss:.4f} | Validation MSELoss: {val_loss:.4f}')
 
         # Append the loss values for the current epoch to the loss_log dictionary
         loss_log['train_loss'].append(epoch_loss)
