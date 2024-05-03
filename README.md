@@ -9,7 +9,7 @@ Welcome to the **Synthetic Kids' Data Modeling Pipeline for Height Prediction**,
 - **Versatile Script**: Capable of performing training, testing, and visualization in a few lines of bash command.
 
 ## Getting Started
-To get started with the pipeline, create a conda environment using the provided [`environment.yml`](src/environment.yml) file with the following command:
+To get started with the pipeline, create a conda environment using the provided [`environment.yml`](environment.yml) file with the following command:
 
 ```bash
 conda env create -f environment.yml
