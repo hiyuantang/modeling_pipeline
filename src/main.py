@@ -51,6 +51,7 @@ def main():
         session_results_dir = generate_unique_hash()
         os.makedirs(session_results_dir, exist_ok=True)
 
+        # Obtain and save model information
         model_temp, model_summary = get_pretrained_model(args.model_name, num_classes=1, 
                                                              drop_rate=args.drop_rate, batch_size=args.batch_size, 
                                                              pretrained=args.pre_trained)
@@ -61,9 +62,11 @@ def main():
         model_summary_file_path = os.path.join(session_results_dir, 'model_summary.txt')
         with open(model_summary_file_path, 'w') as summary_file:
             summary_file.write(model_summary)
+        
+        print(f'Model information saved to {model_summary_file_path}')
 
         # Create a dictionary with model information
-        model_info = {
+        session_info = {
             'id': session_results_dir, 
             'model_name': args.model_name,
             'train_data_dir': args.train_data_dir,
@@ -80,12 +83,12 @@ def main():
             'total_params': total_params
         }
 
-        # Save the model information to info.json within the session directory
+        # Save the seession information to info.json within the session directory
         info_file_path = os.path.join(session_results_dir, 'info.json')
         with open(info_file_path, 'w') as info_file:
-            json.dump(model_info, info_file, indent=4)
+            json.dump(session_info, info_file, indent=4)
 
-        print(f'Model information saved to {info_file_path}')
+        print(f'Session information saved to {info_file_path}')
 
         # Call the train function
         train(args.model_name, args.train_data_dir, args.epochs, args.batch_size, 
