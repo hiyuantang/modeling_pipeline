@@ -1,14 +1,21 @@
-name: syn_model
+name: pytorch
 channels:
+  - pytorch
+  - nvidia
+  - conda-forge
   - defaults
 dependencies:
   - python=3.11
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cudatoolkit=12.1
   - matplotlib
   - numpy
   - scipy
   - scikit-learn
-  - torch
-  - torchvision
-  - torchinfo
   - tqdm
   - pillow
+  - pip
+  - pip:
+      - torchinfo
