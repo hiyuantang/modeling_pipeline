@@ -51,10 +51,16 @@ def main():
         session_results_dir = generate_unique_hash()
         os.makedirs(session_results_dir, exist_ok=True)
 
-        total_params = count_parameters(get_pretrained_model(args.model_name, num_classes=1, 
+        model_temp, model_summary = get_pretrained_model(args.model_name, num_classes=1, 
                                                              drop_rate=args.drop_rate, batch_size=args.batch_size, 
-                                                             pretrained=args.pre_trained, 
-                                                             print_summary=False))
+                                                             pretrained=args.pre_trained)
+        
+        total_params = count_parameters(model_temp)
+        del model_temp
+
+        model_summary_file_path = os.path.join(session_results_dir, 'model_summary.txt')
+        with open(model_summary_file_path, 'w') as summary_file:
+            summary_file.write(model_summary)
 
         # Create a dictionary with model information
         model_info = {
