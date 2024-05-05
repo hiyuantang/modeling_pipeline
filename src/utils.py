@@ -390,3 +390,15 @@ def worst_pred(session_path, dataset, idxes, mode):
         # Adjust the layout and display the plot
         plt.tight_layout()
         plt.show()
+
+def validate_and_prompt_path(path):
+    # Check if the path is valid
+    if not os.path.exists(path):
+        # Path is not valid, prompt the user for a new path
+        print("The provided path is invalid. Please enter a valid path.")
+        new_path = input("Enter a new path: ")
+        return validate_and_prompt_path(new_path)
+    else:
+        # Path is valid, return the valid path
+        print("The provided path is valid.")
+        return path
