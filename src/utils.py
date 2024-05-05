@@ -220,11 +220,11 @@ def pred_vis(session_path, save_dir, save=True):
     # Create a line space for the ideal line where ground truth equals predictions
     line_space = np.linspace(58, 88, 30)
     plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')  # Red dashed line
-    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1')  # Blue dashed line for +1 error margin
+    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1 (cm)')  # Blue dashed line for +1 error margin
     plt.plot(line_space, line_space - 1, 'b', alpha=1)  # Blue dashed line for -1 error margin
 
-    plt.xlabel('Ground Truth')
-    plt.ylabel('Prediction')
+    plt.xlabel('Ground Truth (cm)')
+    plt.ylabel('Prediction (cm)')
     plt.legend()
     plt.tight_layout()
 
@@ -298,3 +298,95 @@ def metric_vis(session_path_list, metric, save_dir, ylim=None):
 
     # Save the plot
     plt.savefig(os.path.join(save_dir, f'{metric}_plot.png'))
+
+
+def worst_pred(session_path, dataset, idxes, mode):
+    """
+    Visualize the samples with the worst predictions compared to ground truth.
+
+    This function loads the prediction and ground truth data from a JSON file, 
+    calculates the difference between predictions and ground truth based on the
+    specified mode, finds the samples with the largest errors, and plots the 
+    ground truth vs prediction scatter plot along with the corresponding images.
+
+    Args:
+        session_path (str): Path to the session directory containing the 'pred.json' file.
+        dataset (Dataset): The dataset object containing the images and labels.
+        idxes (list): The indexes of the target samples to visualize, sorted by worst predictions.
+        mode (str): The mode for calculating prediction errors. Options are:
+            'abs' - Absolute difference between ground truth and prediction
+            'h'   - Positive difference (prediction higher than ground truth) 
+            'l'   - Negative difference (prediction lower than ground truth)
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If loaded ground truth data does not match the dataset labels
+                        within the specified tolerance.
+
+    Example:
+        worst_pred('path/to/session', my_dataset, [0, 1, 2, 3, 4], 'abs')
+    """
+    
+    # Load prediction and ground truth data from JSON file
+    pred_path = os.path.join(session_path, 'pred.json')
+    pred_info = json2dict(pred_path)
+    
+    # Extract ground truth and prediction arrays
+    gt = np.array(pred_info['true_labels']).reshape(1, -1)[0]  
+    pred = np.array(pred_info['predictions']).reshape(1, -1)[0]
+
+    # Calculate prediction errors based on specified mode
+    if mode == 'abs':
+        # Absolute difference between ground truth and prediction
+        diff = np.abs(gt - pred)
+    elif mode == 'h':  
+        # Positive difference (prediction higher than ground truth)
+        diff = pred - gt
+    elif mode == 'l':
+        # Negative difference (prediction lower than ground truth)
+        diff = gt - pred 
+    else:
+        print('Warning: Mode argument is not recognized.')
+        return
+
+    # Sanity check: Ensure loaded ground truth data matches dataset labels within tolerance
+    assert np.allclose(gt.round(4), np.array(dataset.labels).reshape(1,-1)[0].round(4), 
+                       rtol=1e-4), "Loaded data does not match dataset labels"
+
+    # Find sample indexes with largest errors
+    sorted_idxes = np.argsort(diff)[::-1]
+    target_idxes = np.take(sorted_idxes, idxes)
+
+    # Plot results for each target sample
+    for i, idx in enumerate(target_idxes):
+        # Extract image data and transpose dimensions (CWH to WHC)
+        img_cwh = np.array(dataset.images[idx][0]) 
+        img_whc = img_cwh.transpose(1, 2, 0)
+
+        # Create a new figure with specified size
+        plt.figure(figsize=(7.5, 4))
+
+        # Plot scatter plot of ground truth vs prediction
+        plt.subplot(1, 2, 1)
+        plt.scatter(gt, pred, c='pink', alpha=0.3)
+        plt.scatter(gt[idx], pred[idx], c='red', alpha=1, label='target')  
+        plt.title(f'Ground Truth vs Prediction')
+        line_space = np.linspace(58, 88, 30)
+        plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')
+        plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1') 
+        plt.plot(line_space, line_space - 1, 'b', alpha=1)
+        plt.xlabel('Ground Truth (cm)')
+        plt.ylabel('Prediction (cm)')
+        plt.legend()
+
+        # Plot the corresponding image
+        plt.subplot(1, 2, 2)
+        plt.imshow(img_whc) 
+        plt.title(f"GT: {gt[idx]:.3f}, Pred: {pred[idx]:.3f}, Diff: {diff[idx]:.3f}")
+        plt.axis('off')
+
+        # Adjust the layout and display the plot
+        plt.tight_layout()
+        plt.show()
