@@ -360,7 +360,7 @@ def worst_pred(session_path, dataset, idxes, mode):
     target_idxes = np.take(sorted_idxes, idxes)
 
     # Plot results for each target sample
-    for i, idx in enumerate(target_idxes):
+    for idx in target_idxes:
         # Extract image data and transpose dimensions (CWH to WHC)
         img_cwh = np.array(dataset.images[idx][0]) 
         img_whc = img_cwh.transpose(1, 2, 0)
@@ -375,7 +375,7 @@ def worst_pred(session_path, dataset, idxes, mode):
         plt.title(f'Ground Truth vs Prediction')
         line_space = np.linspace(58, 88, 30)
         plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')
-        plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1') 
+        plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1 (cm)') 
         plt.plot(line_space, line_space - 1, 'b', alpha=1)
         plt.xlabel('Ground Truth (cm)')
         plt.ylabel('Prediction (cm)')
