@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--model_name', type=str, default='baseline_cnn', help='Name of the model')
     parser.add_argument('--train_data_dir', type=str, default='E:/depth_None_True/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_dir', type=str, default='E:/depth_None_True/testset.pkl', help='Directory of the testing data')
-    parser.add_argument('--epochs', type=int, default=5, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.00002, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
@@ -108,7 +108,7 @@ def main():
     # If in test-only mode, perform testing only
     else:
         test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
-            batch_size=args.batch_size, device=args.device)
+            batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
 
 # Entry point of the script
 if __name__ == "__main__":
