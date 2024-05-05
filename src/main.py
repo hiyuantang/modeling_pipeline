@@ -102,7 +102,7 @@ def main():
             args.learning_rate, args.drop_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
             args.train_split, session_results_dir)
 
-        test(session_dir=session_results_dir, test_data_dir=args.train_data_dir, 
+        test(session_dir=session_results_dir, test_data_dir=args.test_data_dir, 
             batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
     
     # If in test-only mode, perform testing only
