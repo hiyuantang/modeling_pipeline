@@ -176,7 +176,7 @@ def create_dataloader_from_preprocessed(pkl_path, batch_size, transform, shuffle
 
 
 
-def log_vis(session_path_list, save_dir, ylim=[0, 100], key='val', epochs=10, gaussian_smooth=True, sigma=3):
+def log_vis(session_path_list, save_dir, ylim=[0, 100], key='val', epochs=100, gaussian_smooth=True, sigma=3):
     plt.figure(figsize=(5,5))
 
     for path_ in session_path_list:
