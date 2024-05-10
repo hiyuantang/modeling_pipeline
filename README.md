@@ -49,7 +49,7 @@ Please replace `<your_image_data_path>` and `<your_data_path>` with the actual p
 
 ## Step 4: Error Analysis
 
-1. Open the Jupyter notebook titled [`error_analysis_demp.ipynb`](error_analysis_demp.ipynb)
+1. Open the Jupyter notebook titled [`error_analysis_demo.ipynb`](error_analysis_demo.ipynb)
 2. Locate the line of code that reads:
 ```python
 session_path = <your_modeling_session_path> # Define your session path
