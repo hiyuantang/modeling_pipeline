@@ -47,6 +47,17 @@ python3 src/vis.py --all False --session_path <your_modeling_session_path>
 
 Please replace `<your_image_data_path>` and `<your_data_path>` with the actual paths to your data, and `<your_modeling_session_path>` with the path to your specific modeling session.
 
+## Step 4: Error Analysis
+
+1. Open the Jupyter notebook titled [`error_analysis_demp.ipynb`](error_analysis_demp.ipynb)
+2. Locate the line of code that reads:
+```python
+session_path = <your_modeling_session_path> # Define your session path
+```
+3. Replace `<your_modeling_session_path>` with the path to your modeling session
+4. Run all cells in the notebook to execute the error analysis.
+
+
 ## Configuration Arguments
 
 ### For [`to_pickle.py`](src/to_pickle.py)
