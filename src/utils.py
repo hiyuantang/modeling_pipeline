@@ -19,12 +19,37 @@ from torch.utils.data import DataLoader
 from pickle_dataset import PreprocessedDataset
 
 def transform_to_dict(transform):
+    """
+    Convert a torchvision.transforms.Compose object's transforms to a dictionary.
+
+    Args:
+        transform (torchvision.transforms.Compose): A Compose object containing multiple transforms.
+
+    Returns:
+        dict: A dictionary with transform class names as keys and their __dict__ attributes as values.
+    """
     # Assuming each transform has a name attribute
     return {t.__class__.__name__: t.__dict__ for t in transform.transforms}
 
 def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrained):
-    
+    """
+    Retrieve a pretrained model with a custom classifier head based on the specified parameters.
+
+    Args:
+        model_name (str): Name of the model to retrieve.
+        num_classes (int): Number of classes for the final output layer.
+        drop_rate (float): Dropout rate for the classifier head.
+        batch_size (int): Batch size for the input tensor.
+        pretrained (bool): Flag to use pretrained weights or not.
+
+    Raises:
+        ValueError: If the model_name is not supported.
+
+    Returns:
+        tuple: A tuple containing the model and its summary.
+    """
     # Dictionary mapping model names to model functions and their respective weights
+    # SOTA models and custom models are included
     model_dict = {
         # SOTA models
         'vgg16': (models.vgg16, vgg.VGG16_Weights.DEFAULT),
@@ -48,23 +73,29 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
         'baseline_cnn': (BaselineCNN, None) 
     }
 
-    # Check if the model name is in the dictionary
+    # Check if the model name is in the dictionary and raise an error if not
     if model_name not in model_dict:
         raise ValueError(f"Model name '{model_name}' is not supported. Please choose from {list(model_dict.keys())}.")
 
+    # Initialize the model variable
     model = None
     
+    # Retrieve the model and its weights if the model name is in the dictionary
     if model_name in model_dict:
         model, weights = model_dict[model_name]
         
+        # Load the model with pretrained weights if specified
         if pretrained:
             model = model(weights=weights)
         else:
+            # Attempt to instantiate the model without weights
             try:
                 model = model()
             except:
+                # If the model requires additional parameters, provide them
                 model = model(drop_rate, num_classes)
         
+        # Customize the classifier head based on the model type
         if model_name.startswith('baseline'):
             pass
         elif model_name.startswith('vit_'):
@@ -104,177 +135,336 @@ def get_pretrained_model(model_name, num_classes, drop_rate, batch_size, pretrai
                     nn.Linear(256, num_classes)
                     )
     
-    # Create a StringIO stream to capture the output
+    # Create a StringIO stream to capture the output of the summary function
     f = io.StringIO()
     with redirect_stdout(f):
         summary(model, input_size=(batch_size, 3, 224, 224))
     
-    # Get the summary from the StringIO stream
+    # Retrieve the captured summary from the StringIO stream
     model_summary = f.getvalue()
 
+    # Return the model and its summary
     return model, model_summary
 
 def count_parameters(model):
+    """
+    Count the total number of parameters in a model.
+
+    Args:
+        model (torch.nn.Module): The model to count parameters for.
+
+    Returns:
+        int: The total number of parameters in the model.
+    """
+    # Calculate the total number of parameters using a generator expression
     return sum(p.numel() for p in model.parameters())
 
 def generate_unique_hash():
+    """
+    Generate a unique hash to be used as a directory name for session results.
+
+    Returns:
+        str: The path to the unique session results directory.
+    """
     # Loop until a unique hash is generated
     while True:
+        # Generate a hash based on the current time
         unique_hash = hashlib.md5(str(time.time()).encode()).hexdigest()
+        # Construct the directory path using the unique hash
         session_results_dir = os.path.join('./results', unique_hash)
+        # Check if the directory already exists
         if not os.path.exists(session_results_dir):
             break
-        time.sleep(0.1)  # Wait a bit before trying a new hash
+        # Wait a bit before trying to generate a new hash
+        time.sleep(0.1)
+    # Return the unique session results directory path
     return session_results_dir
 
 def list_subdirectories(directory_path):
+    """
+    List all subdirectories within a given directory path.
+
+    Args:
+        directory_path (str): The path to the directory.
+
+    Returns:
+        list: A list of subdirectory names within the given directory path.
+    """
+    # Use a list comprehension to filter for directories only
     subdirectories = [entry for entry in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, entry))]
+    # Return the list of subdirectories
     return subdirectories
 
 def json2dict(json_file_path):
+    """
+    Load and return the contents of a JSON file as a dictionary.
+
+    Parameters:
+    - json_file_path (str): The file path to the JSON file.
+
+    Returns:
+    - dict: The contents of the JSON file.
+    """
     with open(json_file_path, 'r') as file:
+        # Load the JSON file and return its contents
         return json.load(file)
 
 def get_subdirpath_list(directory_path='results'):
+    """
+    Generate a list of subdirectory paths within a given directory.
+
+    Parameters:
+    - directory_path (str): The parent directory path. Defaults to 'results'.
+
+    Returns:
+    - list: A list of subdirectory paths.
+    """
     result_path_list = []
+    # Retrieve a list of subdirectories
     subdirs = list_subdirectories(directory_path)
     for subdir in subdirs:
+        # Join the parent directory with the subdirectory
         cur_path = os.path.join('results', subdir)
         result_path_list.append(cur_path)
     return result_path_list
 
 def preprocess_and_save_dataset(dataloader, save_path):
+    """
+    Preprocess data from a dataloader and save it to a file.
+
+    Parameters:
+    - dataloader (DataLoader): The dataloader containing the dataset to preprocess.
+    - save_path (str): The file path to save the preprocessed data.
+    """
     if os.path.exists(save_path):
+        # If the file already exists, print a message and return
         print(f"Preprocessed data file '{save_path}' already exists. Continuing without reprocessing.")
         return
 
     preprocessed_data = []
+    # Process each batch of images and labels
     for images, labels in tqdm(dataloader, desc='Progress'):
         preprocessed_data.append((images, labels))
 
     with open(save_path, 'wb') as f:
+        # Save the preprocessed data to a file
         pickle.dump(preprocessed_data, f)
         print(f"Preprocessed data saved to '{save_path}'.")
 
 def load_preprocessed_dataset(pkl_path):
+    """
+    Load a preprocessed dataset from a pickle file.
+
+    Parameters:
+    pkl_path (str): The path to the pickle file containing the preprocessed data.
+
+    Returns:
+    preprocessed_data: The data loaded from the pickle file.
+    """
+    # Open the pickle file in read-binary mode
     with open(pkl_path, 'rb') as f:
+        # Load the data from the pickle file
         preprocessed_data = pickle.load(f)
     return preprocessed_data
 
 def create_dataset_from_preprocessed(pkl_path, transform):
+    """
+    Create a dataset object from preprocessed data with optional transforms.
+
+    Parameters:
+    pkl_path (str): The path to the pickle file containing the preprocessed data.
+    transform (callable, optional): A function/transform that takes in a sample and returns a transformed version.
+
+    Returns:
+    PreprocessedDataset: The dataset object created from the preprocessed data.
+    """
+    # Load the preprocessed data from the pickle file
     preprocessed_data = load_preprocessed_dataset(pkl_path)
+    # Create a dataset object with the preprocessed data and the transform
     preprocessed_dataset = PreprocessedDataset(preprocessed_data, transform=transform)
     return preprocessed_dataset
 
 def create_dataloader_from_preprocessed(pkl_path, batch_size, transform, shuffle=True):
+    """
+    Create a DataLoader from preprocessed data with optional transforms and shuffling.
+
+    Parameters:
+    pkl_path (str): The path to the pickle file containing the preprocessed data.
+    batch_size (int): How many samples per batch to load.
+    transform (callable, optional): A function/transform that takes in a sample and returns a transformed version.
+    shuffle (bool, optional): Set to True to have the data reshuffled at every epoch (default: True).
+
+    Returns:
+    DataLoader: The DataLoader object for the preprocessed dataset.
+    """
+    # Create a dataset object from the preprocessed data with the given transform
     preprocessed_dataset = create_dataset_from_preprocessed(pkl_path, transform)
+    # Create a DataLoader with the dataset, batch size, and shuffle option
     preprocessed_dataloader = DataLoader(preprocessed_dataset, batch_size=batch_size, shuffle=shuffle)
     return preprocessed_dataloader
 
 def log_vis(session_path_list, save_dir, ylim=[0, 100], key='val', epochs=100, gaussian_smooth=True, sigma=3):
+    """
+    Visualize and save a plot of the loss curves from training sessions.
+
+    Parameters:
+    session_path_list (list of str): List of paths to session directories containing 'info.json' and 'train_log.json'.
+    save_dir (str): Directory where the plot image will be saved.
+    ylim (list of int): The y-axis limits for the plot.
+    key (str): The key prefix for loss values in 'train_log.json'.
+    epochs (int): Number of epochs to plot.
+    gaussian_smooth (bool): Apply Gaussian smoothing to the loss curve if True.
+    sigma (int): The standard deviation for Gaussian kernel.
+
+    Returns:
+    None: The function saves the plot image to the specified directory.
+    """
+    # Initialize a new figure with specified size
     plt.figure(figsize=(5,5))
 
+    # Loop through each session path
     for path_ in session_path_list:
+        # Construct paths to the info and log JSON files
         cur_info_path = os.path.join(path_, 'info.json')
         cur_log_path = os.path.join(path_, 'train_log.json')
 
+        # Extract the loss curve and model name from the JSON files
         log_curve = json2dict(cur_log_path)[f'{key}_loss'][0:epochs]
         log_label = json2dict(cur_info_path)['model_name']
 
-        # Apply Gaussian smoothing
+        # Apply Gaussian smoothing if enabled
         if gaussian_smooth: 
             log_curve = gaussian_filter1d(log_curve, sigma=sigma)
+        # Plot the smoothed curve with the corresponding label
         plt.plot(log_curve, label=log_label) 
 
+    # Set the title, axis labels, and y-axis limits for the plot
     plt.title(f'{key.upper()} LOSS')
     plt.ylim(ylim)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    # Adjust layout for better fit and add legend
     plt.tight_layout()
     plt.legend()
 
-    # Save the plot
+    # Save the plot to the specified directory
     plt.savefig(os.path.join(save_dir, f'{key}_loss_plot.png'))
 
 def pred_vis(session_path, save_dir, save=True):
+    """
+    Visualize the ground truth vs predictions scatter plot.
+
+    Parameters:
+    session_path (str): The directory path where prediction and model info are stored.
+    save_dir (str): The directory path where the plot image will be saved.
+    save (bool): A flag to determine whether to save the plot image or not.
+    """
+    # Construct paths to the prediction and model information JSON files
     pred_info_path = os.path.join(session_path, 'pred.json')
     model_info_path = os.path.join(session_path, 'info.json')
 
+    # Load the prediction and model information into dictionaries
     pred_info = json2dict(pred_info_path)
     model_info = json2dict(model_info_path)
     model_name = model_info['model_name']
 
+    # Convert the true labels and predictions into numpy arrays and reshape for plotting
     gt = np.array(pred_info['true_labels']).reshape(1, -1)
     pred = np.array(pred_info['predictions']).reshape(1, -1)
 
-    # Plot
+    # Initialize the plot with specified figure size
     plt.figure(figsize=(5,5))
+    # Create a scatter plot of ground truth vs predictions
     plt.scatter(gt, pred, c='pink', alpha=0.3)
+    # Set the title of the plot using the model name
     plt.title(f'{model_name} Testset Ground Truth vs Prediction')
 
-    # Create a line space for the ideal line where ground truth equals predictions
-    line_space = np.linspace(58, 88, 30)
-    plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')  # Red dashed line
-    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1 (cm)')  # Blue dashed line for +1 error margin
-    plt.plot(line_space, line_space - 1, 'b', alpha=1)  # Blue dashed line for -1 error margin
+    # Generate a line space for the ideal line where ground truth equals predictions
+    line_space = np.linspace(min(gt), max(gt), 30)
+    # Plot the ideal line where predictions are exactly equal to the ground truth
+    plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')
+    # Plot the error margin lines at +1 and -1 cm
+    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1 (cm)')
+    plt.plot(line_space, line_space - 1, 'b', alpha=1)
 
+    # Label the x-axis and y-axis
     plt.xlabel('Ground Truth (cm)')
     plt.ylabel('Prediction (cm)')
+    # Display the legend
     plt.legend()
+    # Adjust the layout to ensure everything fits without overlap
     plt.tight_layout()
 
-    # Save the plot
-    if save == True:
+    # Save the plot if the save flag is True
+    if save:
         plt.savefig(os.path.join(save_dir, f'{model_name}_gt_pred_plot.png'))
 
 def metric_vis(session_path_list, metric, save_dir, ylim=None):
+    """
+    Visualize the comparison of different models based on a specified metric.
+
+    Parameters:
+    session_path_list (list): A list of directory paths for different model sessions.
+    metric (str): The metric to compare ('r2', 'acc', 'mse', 'mae').
+    save_dir (str): The directory path where the bar plot image will be saved.
+    ylim (tuple): Optional. The y-axis limits for the plot.
+    """
+    # Initialize lists to store paths and metrics
     pred_info_path_list = []
     model_info_path_list = []
+    model_name_list = []
+    metric_list = []
+
+    # Loop through each session path to collect model names and calculate metrics
     for session_path in session_path_list:
+        # Construct paths to the prediction and model information JSON files
         pred_info_path = os.path.join(session_path, 'pred.json')
         model_info_path = os.path.join(session_path, 'info.json')
         pred_info_path_list.append(pred_info_path)
         model_info_path_list.append(model_info_path)
-    
-    model_name_list = []
-    metric_list = []
-    for i in model_info_path_list:
-        model_name_list.append(json2dict(i)['model_name'])
-    for i in pred_info_path_list:
-        pred_info = json2dict(i)
+
+        # Load the model name from the model information file
+        model_name_list.append(json2dict(model_info_path)['model_name'])
+
+    # Calculate the specified metric for each model
+    for pred_info_path in pred_info_path_list:
+        pred_info = json2dict(pred_info_path)
         gt = np.array(pred_info['true_labels']).reshape(1, -1)
         pred = np.array(pred_info['predictions']).reshape(1, -1)
+
+        # Calculate the R-squared score
         if metric == 'r2':
             r2 = r2_score(gt.reshape(-1, 1), pred.reshape(-1, 1))
             metric_list.append(r2)
+        # Calculate the accuracy within an error margin of 1 cm
         elif metric == 'acc':
             accuracy = np.mean(np.abs(gt - pred) <= 1)
             metric_list.append(accuracy)
+        # Calculate the mean squared error
         elif metric == 'mse':
             mse = mean_squared_error(gt, pred)
             metric_list.append(mse)
+        # Calculate the mean absolute error
         elif metric == 'mae':
             mae = mean_absolute_error(gt, pred)
             metric_list.append(mae)
         else:
             print('Metric not yet supported.')
             return
-    
-    # Sort the metrics and model names based on the metric values
+
+    # Sort the models based on the calculated metric values
     sorted_indices = np.argsort(metric_list)[::-1]
     sorted_model_names = np.array(model_name_list)[sorted_indices]
     sorted_metrics = np.array(metric_list)[sorted_indices]
-    
-    # Color settings
-    if metric == 'r2' or metric == 'acc':
-        colors = ['crimson' if i == 0 else 'skyblue' for i in range(len(sorted_model_names))]
-    elif metric == 'mse' or metric == 'mae':
-        colors = ['crimson' if i == len(session_path_list)-1 else 'skyblue' for i in range(len(sorted_model_names))]
-    
-    # Create the bar plot
+
+    # Set the color scheme based on the type of metric
+    colors = ['crimson' if i == 0 else 'skyblue' for i in range(len(sorted_model_names))]
+
+    # Initialize the bar plot with specified figure size
     plt.figure(figsize=(15, 5))
+    # Create a bar plot to compare the models based on the metric
     bars = plt.bar(sorted_model_names, sorted_metrics, color=colors, width=0.7)
-    
+
     # Highlight the best model and show its score
     best_model_index = 0 if metric in ['r2', 'acc'] else len(session_path_list) - 1
     bars[best_model_index].set_label('Best Model')
@@ -282,18 +472,22 @@ def metric_vis(session_path_list, metric, save_dir, ylim=None):
 
     # Annotate the best model's bar with its score
     plt.text(best_model_index, sorted_metrics[best_model_index], f'{sorted_metrics[best_model_index]:.2f}', 
-            ha='center', va='bottom', fontsize=20)
-    
+             ha='center', va='bottom', fontsize=20)
+
+    # Label the y-axis with the metric name
     plt.ylabel(metric.upper(), fontsize=15)
-    if ylim != None:
+    # Set the y-axis limits if provided
+    if ylim is not None:
         plt.ylim(ylim)
+    # Set the title of the plot
     plt.title(f'Comparison of Models Based on {metric.upper()}', fontsize=20)
+    # Rotate the x-axis labels for better readability
     plt.xticks(rotation=45, fontsize=20)
+    # Adjust the layout to ensure everything fits without overlap
     plt.tight_layout()
 
-    # Save the plot
+    # Save the plot image
     plt.savefig(os.path.join(save_dir, f'{metric}_plot.png'))
-
 
 def worst_pred(session_path, dataset, idxes, mode):
     """
@@ -387,13 +581,25 @@ def worst_pred(session_path, dataset, idxes, mode):
         plt.show()
 
 def validate_and_prompt_path(path):
-    # Check if the path is valid
+    """
+    Recursively validate the provided path and prompt for a new one if invalid.
+
+    Parameters:
+    path (str): The file system path to be validated.
+
+    Returns:
+    str: A valid file system path.
+    """
+    # Check if the provided path exists in the file system
     if not os.path.exists(path):
-        # Path is not valid, prompt the user for a new path
+        # Inform the user that the provided path is invalid
         print("The provided path is invalid. Please enter a valid path.")
+        # Prompt the user to enter a new path
         new_path = input("Enter a new path: ")
+        # Recursively call the function with the new path
         return validate_and_prompt_path(new_path)
     else:
-        # Path is valid, return the valid path
+        # Confirm to the user that the provided path is valid
         print("The provided path is valid.")
+        # Return the valid path
         return path
