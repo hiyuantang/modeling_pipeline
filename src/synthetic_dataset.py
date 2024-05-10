@@ -19,9 +19,6 @@ class SyntheticDataset(Dataset):
         self.dpt_data_obj = defaultdict(lambda: {'paths': [], 'degrees': [], 'label': None})
         self.rgb_data_obj = defaultdict(lambda: {'paths': [], 'degrees': [], 'label': None})
         self.seg_data_obj = defaultdict(lambda: {'paths': [], 'degrees': [], 'label': None})
-        # self.dpt_data_deg = defaultdict(lambda: {'paths': [], 'degree': None, 'label': None})
-        # self.rgb_data_deg = defaultdict(lambda: {'paths': [], 'degree': None, 'label': None})
-        # self.seg_data_deg = defaultdict(lambda: {'paths': [], 'degree': None, 'label': None})
 
         # Iterate through all .txt files in the data directory
         for file_name in os.listdir(data_dir):
@@ -57,20 +54,6 @@ class SyntheticDataset(Dataset):
                 self.seg_data_obj[object_id]['degrees'].append(degree)
                 self.seg_data_obj[object_id]['label'] = label
 
-                # # Update data by degree
-                # self.dpt_data_deg[str(object_id)+str(degree)]['paths'].append(dpt_path)
-                # self.dpt_data_deg[str(object_id)+str(degree)]['degree'] = degree
-                # self.dpt_data_deg[str(object_id)+str(degree)]['label'] = label
-
-                # self.rgb_data_deg[str(object_id)+str(degree)]['paths'].append(rgb_path)
-                # self.rgb_data_deg[str(object_id)+str(degree)]['degree'] = degree
-                # self.rgb_data_deg[str(object_id)+str(degree)]['label'] = label
-
-                # self.seg_data_deg[str(object_id)+str(degree)]['paths'].append(seg_path)
-                # self.seg_data_deg[str(object_id)+str(degree)]['degree'] = degree
-                # self.seg_data_deg[str(object_id)+str(degree)]['label'] = label
-
-
     def parse_file_name(self, file_name):
         # Extract object ID and degree from the file name
         pattern = r"child_(\d+)_lbl_(\d+).txt"
@@ -84,8 +67,6 @@ class SyntheticDataset(Dataset):
             return len(self.dpt_data)
         elif self.mode == 'object':
             return len(self.dpt_data_obj)
-        # elif self.mode == 'degree':
-        #     return len(self.dpt_data_deg)
         else:
             pass
 
@@ -136,29 +117,8 @@ def getitem_dict_helper(dict0, dict1, idx, transform, mode):
     
         dict0_array = np.concatenate(dict0_concat, axis=-1)
         dict1_array = np.concatenate(dict1_concat, axis=-1)
-
-    # elif mode == 'degree':
-    #     dict_key = list(dict0.keys())[idx] 
-    #     dict0_concat = []
-    #     dict1_concat = []
-    #     for path in dict0[dict_key]['paths']:
-    #         dict0_img = Image.open(path)
-    #         if transform:
-    #             dict0_img = transform(dict0_img)
-    #         dict0_concat.append(dict0_img)
-          
-    #     for path in dict1[dict_key]['paths']:
-    #         dict1_img = Image.open(path)
-    #         if transform:
-    #             dict1_img = transform(dict1_img)
-    #         dict1_concat.append(dict1_img)
-    
-    #     dict0_array = np.concatenate(dict0_concat, axis=-1)
-    #     dict1_array = np.concatenate(dict1_concat, axis=-1)
         
     label = torch.tensor(dict0[idx]['label'], dtype=torch.float32)
     concat_array = np.concatenate((dict0_array, dict1_array), axis=-1)
 
     return concat_array, label
-
-        
