@@ -10,24 +10,45 @@ from torch.utils.data import random_split
 from utils import *
 
 def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_rate, pre_trained, device, 
-          save_interval, patience, train_split, session_dir):
-    # Load the dataset
+          save_interval, patience, train_split, session_dir):  
+    """
+    Train a deep learning model with the given parameters.
+
+    Args:
+        model_name (str): Name of the model to be used.
+        train_data_dir (str): Directory path to the training data.
+        epochs (int): Number of epochs to train the model.
+        batch_size (int): Size of the batches for training and validation.
+        learning_rate (float): Learning rate for the optimizer.
+        drop_rate (float): Dropout rate for the model.
+        pre_trained (bool): Flag to use pretrained weights.
+        device (str): Device to run the training on ('cpu' or 'cuda').
+        save_interval (int): Interval of batches after which the model state is saved.
+        patience (int): Number of epochs to wait for improvement before early stopping.
+        train_split (float): Fraction of data to be used for training.
+        session_dir (str): Directory path to save the model and logs.
+
+    Returns:
+        None
+    """
+
+    # Define transformations for the training dataset
     train_transform = transforms.Compose([
     transforms.ToTensor(), 
     transforms.Resize((224, 224)), 
     transforms.RandomHorizontalFlip(),  
     transforms.RandomRotation(15), 
-    # transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),  
     transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]) 
     ])
 
+    # Define transformations for the validation dataset
     val_transform = transforms.Compose([
     transforms.ToTensor(), 
     transforms.Resize((224, 224)),   
     transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]) 
     ])
 
-    # Load your dataset
+    # Load and preprocess the dataset
     print('...loading training dataset')
     dataset = create_dataset_from_preprocessed(train_data_dir, None)
 
@@ -36,24 +57,24 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    # Apply the appropriate transform to each subset
+    # Apply transformations to the training and validation datasets
     train_dataset.dataset.transform = train_transform
     val_dataset.dataset.transform = val_transform
 
-    # Create DataLoaders for each subset
+    # Create DataLoader objects for the training and validation datasets
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
     print('...training dataset loading completed')
 
-    # Early stopping initialization
+    # Initialize variables for early stopping
     best_val_loss = float('inf')
     epochs_no_improve = 0
     best_model_state = None
 
-    # Initialize a dictionary to store the loss values for each epoch
+    # Initialize a dictionary to log the loss values
     loss_log = {'train_loss': [], 'val_loss': []}
 
-    # Load the model
+    # Load the model with the specified parameters
     model, _ = get_pretrained_model(model_name, num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=pre_trained)
     device = torch.device(device)
     model = model.to(device)
@@ -62,7 +83,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     criterion = torch.nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    # Training loop
+    # Start the training loop
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
@@ -75,7 +96,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
             optimizer.step()
             running_loss += loss.item()
 
-            # Save the model at the specified interval
+            # Save the model state at specified intervals
             if save_interval == -1:
                 continue
             else:
@@ -83,10 +104,10 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
                     model_save_path = os.path.join(session_dir, f'{model_name}_step_{i+1}.pth')
                     torch.save(model.state_dict(), model_save_path)
 
-        # Compute average training loss
+        # Calculate the average training loss for the epoch
         epoch_loss = running_loss / len(train_loader)
 
-        # Validation loop
+        # Start the validation loop
         val_loss = 0.0
         model.eval()
         with torch.no_grad():
@@ -96,32 +117,28 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
                 loss = criterion(outputs, labels)
                 val_loss += loss.item()
 
-        # Compute average validation loss
+        # Log both training and validation losses
         val_loss /= len(val_loader)
-
-        # Print Both losses
         print(f'Epoch {epoch+1}/{epochs} - Training MSELoss: {epoch_loss:.4f} | Validation MSELoss: {val_loss:.4f}')
-
-        # Append the loss values for the current epoch to the loss_log dictionary
         loss_log['train_loss'].append(epoch_loss)
         loss_log['val_loss'].append(val_loss)
 
-        # Check for improvement
+        # Check if the validation loss has improved
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             epochs_no_improve = 0
-            # Update the best model state
             best_model_state = copy.deepcopy(model.state_dict())
         else:
             epochs_no_improve += 1
             if epochs_no_improve >= patience:
                 print(f'Early stopping triggered after {patience} epochs without improvement.')
                 break
+    # Save the best model state if it exists
     if best_model_state is not None:
         best_model_save_path = os.path.join(session_dir, 'best_model.pth')
         torch.save(best_model_state, best_model_save_path)
 
-    # Save the loss_log dictionary as a JSON file
+    # Save the training and validation loss logs as a JSON file
     log_file_path = os.path.join(session_dir, 'train_log.json')
     with open(log_file_path, 'w') as log_file:
         json.dump(loss_log, log_file)
