@@ -15,7 +15,7 @@ def main():
     # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Process dataset arguments')
     # Add data directory argument with a default path
-    parser.add_argument('--data_dir', type=str, default='E:/synth_rgb_False/trainset.pkl', help='Path to the dataset directory')
+    parser.add_argument('--data_dir', type=str, default='E:/kagglehw_rgb_False/trainset.pkl', help='Path to the dataset directory')
     args = parser.parse_args()
 
     # Define a transform to convert images to tensors
