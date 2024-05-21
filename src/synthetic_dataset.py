@@ -107,7 +107,12 @@ class SyntheticDataset(Dataset):
         Returns:
             int: The number of items.
         """
-        return len(self.dpt_data)
+        if self.image_type == 'depth':
+            return len(self.dpt_data)
+        elif self.image_type == 'rgb':
+            return len(self.rgb_data)
+        elif self.image_type == 'segmentation':
+            return len(self.seg_data)
 
     def __getitem__(self, idx):
         """
