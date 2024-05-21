@@ -9,8 +9,8 @@ import copy
 from torch.utils.data import random_split
 from utils import *
 
-def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_rate, pre_trained, device, 
-          save_interval, patience, train_split, session_dir):  
+def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_rate, pre_trained_torchvision, pre_trained_session_dir, 
+          device, save_interval, patience, train_split, session_dir, update):  
     """
     Train a deep learning model with the given parameters.
 
@@ -21,7 +21,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         batch_size (int): Size of the batches for training and validation.
         learning_rate (float): Learning rate for the optimizer.
         drop_rate (float): Dropout rate for the model.
-        pre_trained (bool): Flag to use pretrained weights.
+        pre_trained_torchvision (bool): Flag to use pretrained weights from torchvision.
         device (str): Device to run the training on ('cpu' or 'cuda').
         save_interval (int): Interval of batches after which the model state is saved.
         patience (int): Number of epochs to wait for improvement before early stopping.
@@ -37,7 +37,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     transforms.ToTensor(), 
     transforms.Resize((224, 224)), 
     transforms.RandomHorizontalFlip(),  
-    transforms.RandomRotation(15), 
+    # transforms.RandomRotation(15), 
     # transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]), # Means and Standard Deviations for depth maps
     # transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261]), # Means and Standard Deviations for RGB images
     transforms.Normalize(mean=[0.3262, 0.3042, 0.2858], std=[0.3102, 0.2950, 0.2840]), # Means and Standard Deviations for Kaggle images
@@ -79,13 +79,50 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     loss_log = {'train_loss': [], 'val_loss': []}
 
     # Load the model with the specified parameters
-    model, _ = get_pretrained_model(model_name, num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=pre_trained)
+    model, _ = get_pretrained_model(model_name, num_classes=1, drop_rate=drop_rate, batch_size=batch_size, pretrained=pre_trained_torchvision)
+    
+    # Check if there is a pre-trained session directory
+    if pre_trained_session_dir is not None:
+        pre_trained_model_weights_path = os.path.join(pre_trained_session_dir, 'best_model.pth')
+        
+        # Load the state dictionary from the .pth file
+        state_dict = torch.load(pre_trained_model_weights_path)
+        
+        # Load the state dictionary into the model
+        model.load_state_dict(state_dict)
+
     device = torch.device(device)
     model = model.to(device)
 
+    # Set parameter updates
+    if update == 'all':
+        for param in model.parameters():
+            param.requires_grad = True
+    elif update == 'readout':
+        for param in model.parameters():
+            param.requires_grad = False
+        if model_name.startswith('baseline'):
+            for param in model.fc_sq.parameters():
+                param.requires_grad = True
+        elif model_name.startswith('vit_'):
+            for param in model.heads.head.parameters():
+                param.requires_grad = True
+        else:
+            if hasattr(model, 'classifier') and isinstance(model.classifier, nn.Module):
+                for param in model.classifier.parameters():
+                    param.requires_grad = True
+            elif hasattr(model, 'fc') and isinstance(model.fc, nn.Module):
+                for param in model.fc.parameters():
+                    param.requires_grad = True
+
     # Define the loss function and optimizer
     criterion = torch.nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    
+    # Filter parameters to include only those with requires_grad=True
+    trainable_params = filter(lambda p: p.requires_grad, model.parameters())
+
+    # Define the optimizer
+    optimizer = optim.Adam(trainable_params, lr=learning_rate)
 
     # Start the training loop
     for epoch in range(epochs):
