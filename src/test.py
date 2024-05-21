@@ -6,7 +6,7 @@ import os
 import json
 from utils import *
 
-def test(session_dir, test_data_dir, batch_size, drop_rate, device):
+def test(session_dir, test_data_path, batch_size, drop_rate, device):
     """
     Perform inference on a test dataset using a pre-trained model.
 
@@ -16,7 +16,7 @@ def test(session_dir, test_data_dir, batch_size, drop_rate, device):
 
     Parameters:
         session_dir (str): Directory where the session's files are stored.
-        test_data_dir (str): Directory containing the preprocessed test data.
+        test_data_path (str): Directory containing the preprocessed test data.
         batch_size (int): The size of the batch for the DataLoader.
         drop_rate (float): The dropout rate used in the model.
         device (str): The device to run the inference on ('cpu' or 'cuda').
@@ -38,7 +38,7 @@ def test(session_dir, test_data_dir, batch_size, drop_rate, device):
 
     # Load the test dataset
     print('...loading testing dataset')
-    test_dataset = create_dataset_from_preprocessed(test_data_dir, test_transform)
+    test_dataset = create_dataset_from_preprocessed(test_data_path, test_transform)
 
     # Create a DataLoader for the test dataset
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
