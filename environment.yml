@@ -13,6 +13,7 @@ dependencies:
   - ipykernel
   - matplotlib
   - numpy
+  - pandas
   - scipy
   - scikit-learn
   - tqdm
