@@ -27,8 +27,10 @@ def main():
         session_path_list = get_subdirpath_list()
 
         # Visualize log information for training and validation
-        log_vis(session_path_list, save_dir, key='train', ylim=[0,100])
-        log_vis(session_path_list, save_dir, key='val', ylim=[0,5])
+        # log_vis(session_path_list, save_dir, key='train', ylim=[0,100]) # For synthetic data
+        # log_vis(session_path_list, save_dir, key='val', ylim=[0,5]) # For synthetic data
+        log_vis(session_path_list, save_dir, key='train', ylim=[0,1000], epochs=250) # For Kaggle data
+        log_vis(session_path_list, save_dir, key='val', ylim=[0,1000], epochs=250) # For kaggle data
 
         # Visualize metrics: accuracy, R-squared, mean squared error, and mean absolute error
         metric_vis(session_path_list, 'acc', save_dir)
