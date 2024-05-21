@@ -20,13 +20,15 @@ def main():
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
     # Add arguments for model configuration
     parser.add_argument('--model_name', type=str, default='baseline_cnn', help='Name of the model')
-    parser.add_argument('--train_data_dir', type=str, default='E:/synth_rgb_False/trainset.pkl', help='Directory of the training data')
-    parser.add_argument('--test_data_dir', type=str, default='E:/synth_rgb_False/testset.pkl', help='Directory of the testing data')
+    parser.add_argument('--train_data_path', type=str, default='E:/synth_rgb_False/trainset.pkl', help='Directory of the training data')
+    parser.add_argument('--test_data_path', type=str, default='E:/synth_rgb_False/testset.pkl', help='Directory of the testing data')
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.00002, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
-    parser.add_argument('--pre_trained', type=bool, default=True, help='Pre-trained weights for the model')
+    parser.add_argument('--pre_trained_torchvision', type=bool, default=True, help='Pre-trained weights for the model from torchvision')
+    parser.add_argument('--pre_trained_session_path', type=str, required=False, help='Pre-trained weights path for the model from session')
+    parser.add_argument('--update', type=str, default='all', choices=['all', 'readout'], help='Transfer Learning: Update all parameters or only the readout')
     parser.add_argument('--device', type=str, default='auto', choices=['auto', 'cuda', 'mps', 'cpu'], help='Device to train and test on')
     parser.add_argument('--save_interval', type=int, default=-1, help='Interval to save the model')
     parser.add_argument('--patience', type=int, default=30, help='Patience for early stopping')
@@ -37,7 +39,7 @@ def main():
 
     # Ensure baseline models are not using pre-trained weights
     if args.model_name.startswith('baseline'):
-        args.pre_trained = False
+        args.pre_trained_torchvision = False
     
     # Automatically define the device for training and testing
     if args.device == 'auto': 
@@ -61,7 +63,7 @@ def main():
         # Obtain and save model information
         model_temp, model_summary = get_pretrained_model(args.model_name, num_classes=1, 
                                                              drop_rate=args.drop_rate, batch_size=args.batch_size, 
-                                                             pretrained=args.pre_trained)
+                                                             pretrained=False)
         
         total_params = count_parameters(model_temp)
         del model_temp
@@ -76,13 +78,15 @@ def main():
         session_info = {
             'id': session_results_dir, 
             'model_name': args.model_name,
-            'train_data_dir': args.train_data_dir,
-            'test_data_dir': args.test_data_dir, 
+            'train_data_path': args.train_data_path,
+            'test_data_path': args.test_data_path, 
             'epochs': args.epochs,
             'batch_size': args.batch_size,
             'learning_rate': args.learning_rate,
             'drop_rate': args.drop_rate, 
-            'pre_trained': args.pre_trained,
+            'pre_trained_torchvision': args.pre_trained_torchvision,
+            'pre_trained_session_path': args.pre_trained_session_path,
+            'update': args.update, 
             'device': str(args.device),
             'save_interval': args.save_interval,
             'patience': args.patience,
@@ -98,16 +102,16 @@ def main():
         print(f'Session information saved to {info_file_path}')
 
         # Train the model
-        train(args.model_name, args.train_data_dir, args.epochs, args.batch_size, 
-            args.learning_rate, args.drop_rate, args.pre_trained, args.device, args.save_interval, args.patience, 
-            args.train_split, session_results_dir)
+        train(args.model_name, args.train_data_path, args.epochs, args.batch_size, 
+            args.learning_rate, args.drop_rate, args.pre_trained_torchvision, args.pre_trained_session_path, 
+            args.device, args.save_interval, args.patience, args.train_split, session_results_dir, args.update)
 
-        test(session_dir=session_results_dir, test_data_dir=args.test_data_dir, 
+        test(session_dir=session_results_dir, test_data_path=args.test_data_path, 
             batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
     
     # If in test-only mode, perform testing only
     else:
-        test(session_dir=args.session_path, test_data_dir=args.test_data_dir, 
+        test(session_dir=args.session_path, test_data_path=args.test_data_path, 
             batch_size=args.batch_size, drop_rate=args.drop_rate, device=args.device)
 
 # Entry point of the script
