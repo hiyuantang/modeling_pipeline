@@ -11,7 +11,11 @@ class Kaggle_HW_Dataset(Dataset):
         self.transform = transform
         self.gray_scale = gray_scale
         self.label_option = label
-        if label != 'H' or label != 'W':
+        if label=='H':
+            print('Generating dataset with Height labels.')
+        elif label=='W':
+            print('Generating dataset with Weight labels.')
+        else:
             raise ValueError("Label must be 'H' for height or 'W' for weight")
 
         df_meta_data = pd.read_csv(os.path.join(data_dir, 'Output_data.csv'))
@@ -28,7 +32,7 @@ class Kaggle_HW_Dataset(Dataset):
     
     def _parse_height_weight(self, hw_str):
         # Example format: "4' 10\" 170 lbs."
-        height_match = re.match(r"(\d+)' (\d+)\"", hw_str)
+        height_match = re.match(r" (\d+)' (\d+)\"", hw_str)
         weight_match = re.search(r"(\d+) lbs.", hw_str)
         
         if height_match and weight_match:
