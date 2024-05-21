@@ -39,7 +39,8 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     transforms.RandomHorizontalFlip(),  
     transforms.RandomRotation(15), 
     # transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]), # Means and Standard Deviations for depth maps
-    transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261]), # Means and Standard Deviations for RGB images
+    # transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261]), # Means and Standard Deviations for RGB images
+    transforms.Normalize(mean=[0.3262, 0.3042, 0.2858], std=[0.3102, 0.2950, 0.2840]), # Means and Standard Deviations for Kaggle images
     ])
 
     # Define transformations for the validation dataset
@@ -47,7 +48,8 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     transforms.ToTensor(), 
     transforms.Resize((224, 224)),   
     # transforms.Normalize(mean=[0.3568, 0.3568, 0.3568], std=[0.3512, 0.3512, 0.3512]), # Means and Standard Deviations for depth maps
-    transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261]), # Means and Standard Deviations for RGB images
+    # transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261]), # Means and Standard Deviations for RGB images
+    transforms.Normalize(mean=[0.3262, 0.3042, 0.2858], std=[0.3102, 0.2950, 0.2840]), # Means and Standard Deviations for Kaggle images
     ])
 
     # Load and preprocess the dataset
