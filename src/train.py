@@ -22,11 +22,13 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         learning_rate (float): Learning rate for the optimizer.
         drop_rate (float): Dropout rate for the model.
         pre_trained_torchvision (bool): Flag to use pretrained weights from torchvision.
+        pre_trained_session_dir (bool): Flag to use pretrained weights from session.
         device (str): Device to run the training on ('cpu' or 'cuda').
         save_interval (int): Interval of batches after which the model state is saved.
         patience (int): Number of epochs to wait for improvement before early stopping.
         train_split (float): Fraction of data to be used for training.
         session_dir (str): Directory path to save the model and logs.
+        update (str): Transfer Learning updating all parameters or only the readout.
 
     Returns:
         None
@@ -117,7 +119,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
 
     # Define the loss function and optimizer
     criterion = torch.nn.MSELoss()
-    
+
     # Filter parameters to include only those with requires_grad=True
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
 
