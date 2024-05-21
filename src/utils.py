@@ -369,29 +369,29 @@ def pred_vis(session_path, save_dir, save=True):
     model_name = model_info['model_name']
 
     # Convert the true labels and predictions into numpy arrays and reshape for plotting
-    gt = np.array(pred_info['true_labels']).reshape(1, -1)
-    pred = np.array(pred_info['predictions']).reshape(1, -1)
+    gt = np.array(pred_info['true_labels']).reshape(1, -1)[0]
+    pred = np.array(pred_info['predictions']).reshape(1, -1)[0]
 
     # Initialize the plot with specified figure size
     plt.figure(figsize=(5,5))
     # Create a scatter plot of ground truth vs predictions
     plt.scatter(gt, pred, c='pink', alpha=0.3)
-    # Set the title of the plot using the model name
-    plt.title(f'{model_name} Testset Ground Truth vs Prediction')
 
     # Generate a line space for the ideal line where ground truth equals predictions
-    line_space = np.linspace(min(gt), max(gt), 30)
+    line_space = np.linspace(min(gt), max(gt), 100)
     # Plot the ideal line where predictions are exactly equal to the ground truth
     plt.plot(line_space, line_space, 'r', alpha=1, label='Ideal: pred = truth')
     # Plot the error margin lines at +1 and -1 cm
-    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin +-1 (cm)')
+    plt.plot(line_space, line_space + 1, 'b', alpha=1, label='Error Margin ±1 (cm)')
     plt.plot(line_space, line_space - 1, 'b', alpha=1)
 
     # Label the x-axis and y-axis
     plt.xlabel('Ground Truth (cm)')
     plt.ylabel('Prediction (cm)')
+    # Set the title of the plot using the model name
+    plt.title(f'{model_name} Testset Ground Truth vs Prediction')
     # Display the legend
-    plt.legend()
+    # plt.legend()
     # Adjust the layout to ensure everything fits without overlap
     plt.tight_layout()
 
@@ -458,7 +458,15 @@ def metric_vis(session_path_list, metric, save_dir, ylim=None):
     sorted_metrics = np.array(metric_list)[sorted_indices]
 
     # Set the color scheme based on the type of metric
-    colors = ['crimson' if i == 0 else 'skyblue' for i in range(len(sorted_model_names))]
+    if metric in ['acc', 'r2']:
+        # Higher is better
+        colors = ['crimson' if i == 0 else 'skyblue' for i in range(len(sorted_model_names))]
+    elif metric in ['mse', 'mae']:
+        # Lower is better
+        colors = ['crimson' if i == len(sorted_model_names) - 1 else 'skyblue' for i in range(len(sorted_model_names))]
+    else:
+        # Default color scheme if metric type is unknown
+        colors = ['skyblue' for _ in range(len(sorted_model_names))]
 
     # Initialize the bar plot with specified figure size
     plt.figure(figsize=(15, 5))
