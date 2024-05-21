@@ -6,11 +6,11 @@ channels:
   - defaults
 dependencies:
   - python=3.11
-  - ipykernel
   - pytorch
   - torchvision
   - torchaudio
   - pytorch-cuda=12.1
+  - ipykernel
   - matplotlib
   - numpy
   - scipy
