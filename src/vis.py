@@ -12,7 +12,7 @@ def main():
     # Initialize the argument parser
     parser = argparse.ArgumentParser(description='Result Visualization')
     # Add an argument to determine whether to process all sessions
-    parser.add_argument('--all', type=bool, default=True, help='All sessions in the results directory')
+    parser.add_argument('--all', type=str2bool, default=True, help='All sessions in the results directory')
     # Add an argument to specify the path for a single session
     parser.add_argument('--session_path', type=str, required=False, help='Path for a single session')
     # Parse the arguments provided by the user
