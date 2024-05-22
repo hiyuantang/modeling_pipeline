@@ -94,7 +94,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         # Load the state dictionary into the model
         model.load_state_dict(state_dict)
 
-        print(f'Loaded pre-trained model weights from the session: \n{pre_trained_session_dir}')
+        print(f'Loaded pre-trained model weights from the session: {pre_trained_session_dir}')
 
     device = torch.device(device)
     model = model.to(device)
