@@ -26,7 +26,7 @@ def main():
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.00002, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
-    parser.add_argument('--pre_trained_torchvision', type=bool, default=False, help='Pre-trained weights for the model from torchvision')
+    parser.add_argument('--pre_trained_torchvision', type=bool, default=True, help='Pre-trained weights for the model from torchvision')
     parser.add_argument('--pre_trained_session_path', type=str, required=False, help='Pre-trained weights path for the model from session')
     parser.add_argument('--update', type=str, default='all', choices=['all', 'readout'], help='Transfer Learning: Update all parameters or only the readout')
     parser.add_argument('--device', type=str, default='auto', choices=['auto', 'cuda', 'mps', 'cpu'], help='Device to train and test on')
