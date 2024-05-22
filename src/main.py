@@ -19,7 +19,7 @@ def main():
     # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
     # Add arguments for model configuration
-    parser.add_argument('--model_name', type=str, default='resnet34', help='Name of the model')
+    parser.add_argument('--model_name', type=str, default='resnet50', help='Name of the model')
     parser.add_argument('--train_data_path', type=str, default='E:/kagglehw_rgb_False/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_path', type=str, default='E:/kagglehw_rgb_False/testset.pkl', help='Directory of the testing data')
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
