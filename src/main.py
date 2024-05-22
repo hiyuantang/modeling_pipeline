@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--model_name', type=str, default='resnet50', help='Name of the model')
     parser.add_argument('--train_data_path', type=str, default='E:/kagglehw_rgb_False/trainset.pkl', help='Directory of the training data')
     parser.add_argument('--test_data_path', type=str, default='E:/kagglehw_rgb_False/testset.pkl', help='Directory of the testing data')
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=1000, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.00002, help='Learning rate')
     parser.add_argument('--drop_rate', type=float, default=0.1, help='Drop out rate')
