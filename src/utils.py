@@ -594,10 +594,10 @@ def validate_and_prompt_path(path):
     Recursively validate the provided path and prompt for a new one if invalid.
 
     Parameters:
-    path (str): The file system path to be validated.
+        path (str): The file system path to be validated.
 
     Returns:
-    str: A valid file system path.
+        str: A valid file system path.
     """
     # Check if the provided path exists in the file system
     if not os.path.exists(path):
@@ -614,6 +614,22 @@ def validate_and_prompt_path(path):
         return path
 
 def str2bool(v):
+    """
+    Convert a string representation of truth to a boolean.
+
+    This function is intended to be used with argparse to handle boolean command-line arguments.
+    It converts common string representations of boolean values to actual boolean values.
+
+    Parameters:
+        v (str or bool): The value to convert. If the value is already a boolean, it is returned as is.
+            If the value is a string, it is converted to a boolean based on common representations.
+
+    Returns:
+        bool: The boolean value corresponding to the input string.
+
+    Raises:
+        argparse.ArgumentTypeError: If the input string does not represent a boolean value.
+    """
     if isinstance(v, bool):
         return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
