@@ -152,8 +152,7 @@ cython_debug/
 #.idea/
 
 # Custom
-results/
 vis/
-results_extra/
-results_final/
+results*
+pretrained*
 .DS_Store
