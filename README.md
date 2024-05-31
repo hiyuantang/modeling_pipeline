@@ -77,6 +77,9 @@ The `main.py` script offers a variety of command-line arguments for customizatio
 - **`--epochs`**: Number of training epochs. Default: `100`.
 - **`--batch_size`**: Batch size for data processing. Default: `128`.
 - **`--learning_rate`**: Learning rate for training. Default: `0.0001`.
+- **`--drop_rate`**: Drop out rate. Default: `0.1`.
+- **`--pre_trained_torchvision`**: Pre-trained weights for the model from torchvision. Default: `True`.
+- **`--pre_trained_session_path`**: Pre-trained weights path for the model from session. Default: `None`.
 - **`--device`**: Device for training (use `mps` for Mac). Default: `cuda`.
 - **`--save_interval`**: Model save interval during training (set `-1` for no periodic save). Default: `-1`.
 - **`--patience`**: Epochs to wait before early stopping. Default: `30`.
