@@ -20,8 +20,8 @@ def main():
     # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Process dataset arguments')
     # Add arguments for dataset configuration
-    parser.add_argument('--data_dir', type=str, default='E:/kaggle_height_weight', help='Path to the dataset directory')
-    parser.add_argument('--data_name', type=str, choices=['synth', 'kagglehw'], default='kagglehw', help='Name of the dataset')
+    parser.add_argument('--data_dir', type=str, default='E:/FigureSynth', help='Path to the dataset directory')
+    parser.add_argument('--data_name', type=str, choices=['synth', 'kagglehw'], default='synth', help='Name of the dataset')
     parser.add_argument('--image_type', type=str, default='rgb', help='Type of image (e.g., depth, rgb, or segmentation)')
     parser.add_argument('--gray_scale', type=str2bool, default=False, help='Convert the image to grayscale by averaging over RGB channels')
     parser.add_argument('--H_or_W', type=str, default='H', choices=['H', 'W'], help='Create dataset label as height or weight')
