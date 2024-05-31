@@ -65,7 +65,7 @@ Customize the data processing with these arguments:
 
 - **`--data_dir`**: Path to the dataset directory. Default: `E:/FigureSynth`.
 - **`--data_name`**: Name of the dataset (e.g., `synth`, `kagglehw`). Default: `synth`.
-- **`--image_type`**: Type of image (e.g., `depth`, `color`). Default: `depth`.
+- **`--image_type`**: Type of image (e.g., `depth`, `rgb`, `segmentation`). Default: `depth`.
 - **`--gray_scale`**: Convert the image to grayscale by averaging over RGB channels. Default: `False`.
 - **`--H_or_W`**: Create dataset label as height or weight (e.g., `H`, `W`). Default: `H`.
 - **`--train_size`**: Proportion of the dataset for training. Default: `0.9`.
@@ -74,13 +74,15 @@ Customize the data processing with these arguments:
 The `main.py` script offers a variety of command-line arguments for customization:
 
 - **`--model_name`**: The model to use. Default: `resnet34`.
-- **`--train_data_dir`**: The training data directory. Default: `E:\\db_synthetic_1`.
-- **`--epochs`**: Number of training epochs. Default: `100`.
+- **`--train_data_dir`**: Path of the training data. Default: `E:/synth_depth_False/trainset.pkl`.
+- **`--test_data_dir`**: Path of the testing data. Default: `E:/synth_depth_False/testset.pkl`.
+- **`--epochs`**: Number of training epochs. Default: `250`.
 - **`--batch_size`**: Batch size for data processing. Default: `128`.
 - **`--learning_rate`**: Learning rate for training. Default: `0.0001`.
 - **`--drop_rate`**: Drop out rate. Default: `0.1`.
 - **`--pre_trained_torchvision`**: Pre-trained weights for the model from torchvision. Default: `True`.
 - **`--pre_trained_session_path`**: Pre-trained weights path for the model from session. Default: `None`.
+- **`--update`**: Transfer Learning: Update all parameters or only the readout. Default: `all`.
 - **`--device`**: Device for training (use `mps` for Mac). Default: `cuda`.
 - **`--save_interval`**: Model save interval during training (set `-1` for no periodic save). Default: `-1`.
 - **`--patience`**: Epochs to wait before early stopping. Default: `30`.
