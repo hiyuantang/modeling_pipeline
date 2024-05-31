@@ -63,10 +63,11 @@ session_path = <your_modeling_session_path> # Define your session path
 ### For [`to_pickle.py`](src/to_pickle.py)
 Customize the data processing with these arguments:
 
-- **`--data_dir`**: Path to the dataset directory. Default: `E:\\synthetic_kids`.
+- **`--data_dir`**: Path to the dataset directory. Default: `E:/FigureSynth`.
+- **`--data_name`**: Name of the dataset (e.g., `synth`, `kagglehw`). Default: `synth`.
 - **`--image_type`**: Type of image (e.g., `depth`, `color`). Default: `depth`.
-- **`--mode`**: Dataset mode. Default: `None`.
-- **`--expand`**: Maintain 3 channels or average to 1 channel. Default: `True`.
+- **`--gray_scale`**: Convert the image to grayscale by averaging over RGB channels. Default: `False`.
+- **`--H_or_W`**: Create dataset label as height or weight (e.g., `H`, `W`). Default: `H`.
 - **`--train_size`**: Proportion of the dataset for training. Default: `0.9`.
 
 ### For [`main.py`](src/main.py)
