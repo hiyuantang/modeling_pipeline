@@ -34,6 +34,7 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
         None
     """
     normalization = get_normalization(train_data_dir)
+    print()
 
     # Define transformations for the training dataset
     train_transform = transforms.Compose([
@@ -43,6 +44,11 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     transforms.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.2)),  # Zoom in and out
     normalization
     ])
+
+    # Save the transformation information as a JSON file
+    trans_file_path = os.path.join(session_dir, 'transformation.json')
+    with open(trans_file_path, 'w') as log_file:
+        json.dump(str(train_transform), log_file)
 
     # Define transformations for the validation dataset
     val_transform = transforms.Compose([
