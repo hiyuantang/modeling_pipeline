@@ -2,7 +2,7 @@ import argparse
 import torch
 from torchvision import transforms
 from tqdm import tqdm
-from utils import create_dataloader_from_preprocessed
+from utils import create_dataloader_from_pickle
 
 def main():
     """
@@ -15,7 +15,7 @@ def main():
     # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Process dataset arguments')
     # Add data directory argument with a default path
-    parser.add_argument('--data_dir', type=str, default='E:/kagglehw_rgb_False/trainset.pkl', help='Path to the dataset directory')
+    parser.add_argument('--data_dir', type=str, default='E:/synth_depth_False/train', help='Path to the dataset directory')
     args = parser.parse_args()
 
     # Define a transform to convert images to tensors
@@ -23,7 +23,7 @@ def main():
     
     # Load the dataset from the specified directory
     print('...loading full dataset')
-    loader = create_dataloader_from_preprocessed(args.data_dir, 1, transform=to_tensor)
+    loader = create_dataloader_from_pickle(args.data_dir, 1, transform=to_tensor)
     print('...data successfully loaded from the pickle file.')
 
     # Initialize tensors to hold the mean and standard deviation
