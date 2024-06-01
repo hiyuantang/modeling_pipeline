@@ -229,28 +229,27 @@ def get_subdirpath_list(directory_path='results'):
         result_path_list.append(cur_path)
     return result_path_list
 
-def preprocess_and_save_dataset(dataloader, save_path):
+def preprocess_and_save_dataset(batch, save_path):
     """
-    Preprocess data from a dataloader and save it to a file.
+    Preprocess data from a batch and save it to a file.
 
     Parameters:
-    - dataloader (DataLoader): The dataloader containing the dataset to preprocess.
+    - batch (list): The batch containing the dataset to preprocess.
     - save_path (str): The file path to save the preprocessed data.
+    
+    This function saves the given batch of data to the specified file path in pickle format.
+    If the file already exists, it skips the saving step to avoid redundant processing.
     """
+    # Check if the file already exists
     if os.path.exists(save_path):
-        # If the file already exists, print a message and return
+        # If the file already exists, print a message and return without reprocessing
         print(f"Preprocessed data file '{save_path}' already exists. Continuing without reprocessing.")
         return
 
-    preprocessed_data = []
-    # Process each batch of images and labels
-    for images, labels in tqdm(dataloader, desc='Progress'):
-        preprocessed_data.append((images, labels))
-
+    # Open the file in write-binary mode
     with open(save_path, 'wb') as f:
-        # Save the preprocessed data to a file
-        pickle.dump(preprocessed_data, f)
-        print(f"Preprocessed data saved to '{save_path}'.")
+        # Save the batch data to the file using pickle
+        pickle.dump(batch, f)
 
 def load_preprocessed_dataset(pkl_path):
     """
