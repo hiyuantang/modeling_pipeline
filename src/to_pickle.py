@@ -22,10 +22,11 @@ def main():
     # Add arguments for dataset configuration
     parser.add_argument('--data_dir', type=str, default='E:/FigureSynth', help='Path to the dataset directory')
     parser.add_argument('--data_name', type=str, choices=['synth', 'kagglehw'], default='synth', help='Name of the dataset')
-    parser.add_argument('--image_type', type=str, choices=['depth', 'rgb', 'segmentation'], default='rgb', help='Type of image (e.g., depth, rgb, or segmentation)')
+    parser.add_argument('--image_type', type=str, choices=['depth', 'rgb', 'segmentation'], default='depth', help='Type of image (e.g., depth, rgb, or segmentation)')
     parser.add_argument('--gray_scale', type=str2bool, default=False, help='Convert the image to grayscale by averaging over RGB channels')
     parser.add_argument('--H_or_W', type=str, default='H', choices=['H', 'W'], help='Create dataset label as height or weight')
     parser.add_argument('--train_size', type=float, default=0.9, help='Proportion of dataset to use for training')
+    parser.add_argument('--images_per_pickle', type=int, default=128, help='Number of images per pickle file')
     args = parser.parse_args()
 
     # Define image transformations
@@ -50,8 +51,8 @@ def main():
     train_dataset, test_dataset = random_split(full_dataset, [train_size, test_size])
     
     # Create DataLoaders for the training and testing sets
-    train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=args.images_per_pickle, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.images_per_pickle, shuffle=True)
 
     # Generate a custom directory name based on the provided arguments
     custom_dir_name = f"{args.data_name}_{args.image_type}_{str(args.gray_scale)}"
@@ -59,13 +60,21 @@ def main():
     # Ensure the directory exists
     os.makedirs(custom_dir_path, exist_ok=True)
 
-    # Preprocess and save the training dataset as a pickle file
-    train_pkl_path = os.path.join(custom_dir_path, 'trainset.pkl')
-    preprocess_and_save_dataset(train_loader, train_pkl_path)
+    # Create train and test directories
+    train_dir_path = os.path.join(custom_dir_path, 'train')
+    test_dir_path = os.path.join(custom_dir_path, 'test')
+    os.makedirs(train_dir_path, exist_ok=True)
+    os.makedirs(test_dir_path, exist_ok=True)
 
-    # Preprocess and save the testing dataset as a pickle file
-    test_pkl_path = os.path.join(custom_dir_path, 'testset.pkl')
-    preprocess_and_save_dataset(test_loader, test_pkl_path)
+    # Preprocess and save the training dataset as pickle files
+    for i, batch in enumerate(train_loader):
+        train_pkl_path = os.path.join(train_dir_path, f'{i}.pkl')
+        save_batch2pickle(batch, train_pkl_path)
+
+    # Preprocess and save the testing dataset as pickle files
+    for i, batch in enumerate(test_loader):
+        test_pkl_path = os.path.join(test_dir_path, f'{i}.pkl')
+        save_batch2pickle(batch, test_pkl_path)
 
 # Entry point of the script
 if __name__=='__main__':
