@@ -45,41 +45,42 @@ class SyntheticDataset(Dataset):
         self.seg_data_obj = defaultdict(lambda: {'paths': [], 'degrees': [], 'label': None})
 
         # Process all .txt files in the data directory to gather image paths and labels
-        for file_name in os.listdir(data_dir):
-            if file_name.endswith(".txt"):
-                object_id, degree = self.parse_file_name(file_name)
-                # Construct file names for each image type
-                dpt_file_name = f"child_{object_id:06d}_dpt_{degree:03d}.png"
-                rgb_file_name = f"child_{object_id:06d}_rgb_{degree:03d}.png"
-                seg_file_name = f"child_{object_id:06d}_seg_{degree:03d}.png"
-                # Construct full paths for each image
-                dpt_path = os.path.join(data_dir, dpt_file_name)
-                rgb_path = os.path.join(data_dir, rgb_file_name)
-                seg_path = os.path.join(data_dir, seg_file_name)
+        for root, _, files in os.walk(data_dir):
+            for file_name in files:
+                if file_name.endswith(".txt"):
+                    object_id, degree = self.parse_file_name(file_name)
+                    # Construct file names for each image type
+                    dpt_file_name = f"child_{object_id:06d}_dpt_{degree:03d}.png"
+                    rgb_file_name = f"child_{object_id:06d}_rgb_{degree:03d}.png"
+                    seg_file_name = f"child_{object_id:06d}_seg_{degree:03d}.png"
+                    # Construct full paths for each image
+                    dpt_path = os.path.join(root, dpt_file_name)
+                    rgb_path = os.path.join(root, rgb_file_name)
+                    seg_path = os.path.join(root, seg_file_name)
 
-                # Read the label from the .txt file
-                with open(os.path.join(data_dir, file_name), "r") as f:
-                    first_line = f.readline()
-                    # Extract the label using regex
-                    label = float(re.findall(r"[-+]?\d*\.\d+|\d+", first_line.split(":")[1])[0])
+                    # Read the label from the .txt file
+                    with open(os.path.join(root, file_name), "r") as f:
+                        first_line = f.readline()
+                        # Extract the label using regex
+                        label = float(re.findall(r"[-+]?\d*\.\d+|\d+", first_line.split(":")[1])[0])
 
-                # Update the lists with the new data
-                self.dpt_data.append((dpt_path, degree, label))
-                self.rgb_data.append((rgb_path, degree, label))
-                self.seg_data.append((seg_path, degree, label))
+                    # Update the lists with the new data
+                    self.dpt_data.append((dpt_path, degree, label))
+                    self.rgb_data.append((rgb_path, degree, label))
+                    self.seg_data.append((seg_path, degree, label))
 
-                # Update the dictionaries with object-wise data
-                self.dpt_data_obj[object_id]['paths'].append(dpt_path)
-                self.dpt_data_obj[object_id]['degrees'].append(degree)
-                self.dpt_data_obj[object_id]['label'] = label
+                    # Update the dictionaries with object-wise data
+                    self.dpt_data_obj[object_id]['paths'].append(dpt_path)
+                    self.dpt_data_obj[object_id]['degrees'].append(degree)
+                    self.dpt_data_obj[object_id]['label'] = label
 
-                self.rgb_data_obj[object_id]['paths'].append(rgb_path)
-                self.rgb_data_obj[object_id]['degrees'].append(degree)
-                self.rgb_data_obj[object_id]['label'] = label
+                    self.rgb_data_obj[object_id]['paths'].append(rgb_path)
+                    self.rgb_data_obj[object_id]['degrees'].append(degree)
+                    self.rgb_data_obj[object_id]['label'] = label
 
-                self.seg_data_obj[object_id]['paths'].append(seg_path)
-                self.seg_data_obj[object_id]['degrees'].append(degree)
-                self.seg_data_obj[object_id]['label'] = label
+                    self.seg_data_obj[object_id]['paths'].append(seg_path)
+                    self.seg_data_obj[object_id]['degrees'].append(degree)
+                    self.seg_data_obj[object_id]['label'] = label
 
     def parse_file_name(self, file_name):
         """
@@ -132,8 +133,6 @@ class SyntheticDataset(Dataset):
             return getitem_list_helper(self.seg_data, idx, self.gray_scale, self.transform)
         else:
             raise ValueError("Invalid combination of image_type")
-
-# Helper functions are defined below with their respective docstrings and comments.
 
 def getitem_list_helper(list_, idx, gray_scale, transform):
     """
