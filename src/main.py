@@ -19,9 +19,9 @@ def main():
     # Set up argument parser for command line arguments
     parser = argparse.ArgumentParser(description='Modeling Pipeline.')
     # Add arguments for model configuration
-    parser.add_argument('--model_name', type=str, default='resnet34', help='Name of the model')
-    parser.add_argument('--train_data_path', type=str, default='E:/synth_depth_False/trainset.pkl', help='Path of the training data')
-    parser.add_argument('--test_data_path', type=str, default='E:/synth_depth_False/testset.pkl', help='Path of the testing data')
+    parser.add_argument('--model_name', type=str, default='resnet18', help='Name of the model')
+    parser.add_argument('--train_data_path', type=str, default='E:/synth_depth_False/train', help='Path of the training data')
+    parser.add_argument('--test_data_path', type=str, default='E:/synth_depth_False/test', help='Path of the testing data')
     parser.add_argument('--epochs', type=int, default=250, help='Number of epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
