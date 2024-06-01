@@ -8,16 +8,15 @@ import json
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
 import torch.nn as nn
-from torchvision import models
+from torchvision import models, transforms
 from torchvision.models import resnet, vgg, mobilenet, vision_transformer
 from baseline_cnn import BaselineCNN
 from torchinfo import summary
 from scipy.ndimage import gaussian_filter1d
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from torch.utils.data import DataLoader
-from pickle_dataset import PreprocessedDataset
+from pickle_dataset import PickleDataset
 
 def transform_to_dict(transform):
     """
@@ -229,13 +228,13 @@ def get_subdirpath_list(directory_path='results'):
         result_path_list.append(cur_path)
     return result_path_list
 
-def preprocess_and_save_dataset(batch, save_path):
+def save_batch2pickle(batch, save_path):
     """
     Preprocess data from a batch and save it to a file.
 
     Parameters:
-    - batch (list): The batch containing the dataset to preprocess.
-    - save_path (str): The file path to save the preprocessed data.
+    - batch (list): The batch containing the dataset.
+    - save_path (str): The file path to save the pickle data.
     
     This function saves the given batch of data to the specified file path in pickle format.
     If the file already exists, it skips the saving step to avoid redundant processing.
@@ -243,7 +242,7 @@ def preprocess_and_save_dataset(batch, save_path):
     # Check if the file already exists
     if os.path.exists(save_path):
         # If the file already exists, print a message and return without reprocessing
-        print(f"Preprocessed data file '{save_path}' already exists. Continuing without reprocessing.")
+        print(f"Pickle data file '{save_path}' already exists. Continuing without reprocessing.")
         return
 
     # Open the file in write-binary mode
@@ -251,57 +250,64 @@ def preprocess_and_save_dataset(batch, save_path):
         # Save the batch data to the file using pickle
         pickle.dump(batch, f)
 
-def load_preprocessed_dataset(pkl_path):
+def create_dataset_from_pickle(pkl_dir, transform):
     """
-    Load a preprocessed dataset from a pickle file.
+    Create a dataset object from pickle data with optional transforms.
 
     Parameters:
-    pkl_path (str): The path to the pickle file containing the preprocessed data.
-
-    Returns:
-    preprocessed_data: The data loaded from the pickle file.
-    """
-    # Open the pickle file in read-binary mode
-    with open(pkl_path, 'rb') as f:
-        # Load the data from the pickle file
-        preprocessed_data = pickle.load(f)
-    return preprocessed_data
-
-def create_dataset_from_preprocessed(pkl_path, transform):
-    """
-    Create a dataset object from preprocessed data with optional transforms.
-
-    Parameters:
-    pkl_path (str): The path to the pickle file containing the preprocessed data.
+    pkl_dir (str): The path to the pickle directory containing the pickle data.
     transform (callable, optional): A function/transform that takes in a sample and returns a transformed version.
 
     Returns:
-    PreprocessedDataset: The dataset object created from the preprocessed data.
+    pickle_dataset: The dataset object created from the pickle data.
     """
-    # Load the preprocessed data from the pickle file
-    preprocessed_data = load_preprocessed_dataset(pkl_path)
     # Create a dataset object with the preprocessed data and the transform
-    preprocessed_dataset = PreprocessedDataset(preprocessed_data, transform=transform)
-    return preprocessed_dataset
+    pickle_dataset = PickleDataset(pkl_dir, transform=transform)
+    return pickle_dataset
 
-def create_dataloader_from_preprocessed(pkl_path, batch_size, transform, shuffle=True):
+def create_dataloader_from_pickle(pkl_dir, batch_size, transform, shuffle=True):
     """
-    Create a DataLoader from preprocessed data with optional transforms and shuffling.
+    Create a DataLoader from pickle data with optional transforms and shuffling.
 
     Parameters:
-    pkl_path (str): The path to the pickle file containing the preprocessed data.
+    pkl_dir (str): The path to the pickle directory containing the pickle data.
     batch_size (int): How many samples per batch to load.
     transform (callable, optional): A function/transform that takes in a sample and returns a transformed version.
     shuffle (bool, optional): Set to True to have the data reshuffled at every epoch (default: True).
 
     Returns:
-    DataLoader: The DataLoader object for the preprocessed dataset.
+    pickle_dataloader: The DataLoader object for the pickle dataset.
     """
     # Create a dataset object from the preprocessed data with the given transform
-    preprocessed_dataset = create_dataset_from_preprocessed(pkl_path, transform)
+    pickle_dataset = create_dataset_from_pickle(pkl_dir, transform)
     # Create a DataLoader with the dataset, batch size, and shuffle option
-    preprocessed_dataloader = DataLoader(preprocessed_dataset, batch_size=batch_size, shuffle=shuffle)
-    return preprocessed_dataloader
+    pickle_dataloader = DataLoader(pickle_dataset, batch_size=batch_size, shuffle=shuffle)
+    return pickle_dataloader
+
+def get_normalization(data_dir):
+    """
+    Returns the appropriate transform based on the presence of keywords in the data_dir.
+
+    Args:
+        train_data_dir (str): Directory path of the training data.
+
+    Returns:
+        torchvision.transforms.Normalize: The appropriate normalization.
+    """
+    # Define the normalization parameters
+    synth_depth_normalization = transforms.Normalize(mean=[0.3141, 0.3141, 0.3141], std=[0.3294, 0.3294, 0.3294])
+    synth_rgb_normalization = transforms.Normalize(mean=[0.2341, 0.2244, 0.2061], std=[0.1645, 0.1472, 0.1261])
+    real_human_rgb_normalization = transforms.Normalize(mean=[0.3262, 0.3042, 0.2858], std=[0.3102, 0.2950, 0.2840])
+
+    # Determine the normalization to use based on the directory name
+    if 'synth' in data_dir and 'depth' in data_dir:
+        normalization = synth_depth_normalization
+    elif 'synth' in data_dir and 'rgb' in data_dir:
+        normalization = synth_rgb_normalization
+    elif 'real' in data_dir:
+        normalization = real_human_rgb_normalization
+
+    return normalization
 
 def log_vis(session_path_list, save_dir, ylim=[0, 100], key='val', epochs=100, gaussian_smooth=True, sigma=3):
     """
