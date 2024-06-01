@@ -46,9 +46,9 @@ def train(model_name, train_data_dir, epochs, batch_size, learning_rate, drop_ra
     ])
 
     # Save the transformation information as a JSON file
-    trans_file_path = os.path.join(session_dir, 'transformation.json')
+    trans_file_path = os.path.join(session_dir, 'transform.txt')
     with open(trans_file_path, 'w') as log_file:
-        json.dump(str(train_transform), log_file)
+        log_file.write(str(train_transform))
 
     # Define transformations for the validation dataset
     val_transform = transforms.Compose([
