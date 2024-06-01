@@ -44,7 +44,9 @@ def main():
     
     # Split the dataset into training and testing subsets
     train_size = int(len(full_dataset) * args.train_size)
+    print(f'Train size: {train_size} images')
     test_size = len(full_dataset) - train_size
+    print(f'Test size: {test_size} images')
     train_dataset, test_dataset = random_split(full_dataset, [train_size, test_size])
     
     # Create DataLoaders for the training and testing sets
