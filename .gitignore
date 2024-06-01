@@ -156,3 +156,4 @@ vis/
 results*
 pretrained*
 .DS_Store
+test.ipynb
